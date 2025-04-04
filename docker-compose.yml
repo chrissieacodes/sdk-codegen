@@ -4,6 +4,8 @@ services:
     image: base-sdk
     build:
       context: docker/base/
+    security_opt:
+      no-new-privileges:true
 
   python:
     environment:
