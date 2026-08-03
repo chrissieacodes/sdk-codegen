@@ -53,6 +53,125 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * devDependencies
     * @looker/sdk-codegen-utils bumped from 21.0.19 to 21.0.20
 
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.21 to 21.0.22
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.22 to 21.0.23
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.23 to 21.0.24
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.25 to 21.0.26
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.26 to 21.0.27
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.27 to 21.0.28
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.28 to 21.0.29
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.30 to 21.0.31
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.32 to 21.0.33
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.33 to 21.0.34
+
+## [26.12.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-v21.11.4...sdk-codegen-v26.12.0) (2026-07-13)
+
+
+### Features
+
+* generate SDKs for Looker 26.12 ([#1734](https://github.com/looker-open-source/sdk-codegen/issues/1734)) ([854bb4f](https://github.com/looker-open-source/sdk-codegen/commit/854bb4f16096758cae4a1616f96f46ec2fbb4140))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.34 to 21.0.35
+
+## [21.11.2](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-v21.11.1...sdk-codegen-v21.11.2) (2026-03-25)
+
+
+### Bug Fixes
+
+* **codegen:** implement type-driven form encoding across SDKs ([#1674](https://github.com/looker-open-source/sdk-codegen/issues/1674)) ([58aaf86](https://github.com/looker-open-source/sdk-codegen/commit/58aaf8603be2a10cdd641c84d8d46ff98ce6d269)), closes [#1673](https://github.com/looker-open-source/sdk-codegen/issues/1673)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk-rtl bumped from 21.6.4 to 21.6.5
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.31 to 21.0.32
+
+## [21.11.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-v21.10.4...sdk-codegen-v21.11.0) (2026-03-11)
+
+
+### Features
+
+* **api-explorer:** render and format form-urlencoded queries as body parameters ([#1648](https://github.com/looker-open-source/sdk-codegen/issues/1648)) ([46eb5c9](https://github.com/looker-open-source/sdk-codegen/commit/46eb5c968098417fe3cfb6cce3adf8bffd21d663))
+* refactor SDK generator for form-urlencoded params ([#1647](https://github.com/looker-open-source/sdk-codegen/issues/1647)) ([2197c17](https://github.com/looker-open-source/sdk-codegen/commit/2197c17df142df2de748aaddcdc4815d16724bff)), closes [#1646](https://github.com/looker-open-source/sdk-codegen/issues/1646)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.29 to 21.0.30
+
+## [21.10.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-v21.9.13...sdk-codegen-v21.10.0) (2025-09-17)
+
+
+### Features
+
+* **go:** Expose session object in Go SDK ([#1602](https://github.com/looker-open-source/sdk-codegen/issues/1602)) ([6afa715](https://github.com/looker-open-source/sdk-codegen/commit/6afa7158d6786994b7f2592e634c95f2723c7f8a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @looker/sdk-codegen-utils bumped from 21.0.24 to 21.0.25
+
 ## [21.9.10](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-v21.9.9...sdk-codegen-v21.9.10) (2025-03-11)
 
 

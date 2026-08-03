@@ -218,6 +218,155 @@
     * @looker/sdk-codegen-utils bumped from 21.0.20 to 21.0.21
     * @looker/sdk-rtl bumped from 21.6.3 to 21.6.4
 
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.41 to 0.1.42
+    * @looker/extension-utils bumped from 0.1.51 to 0.1.52
+    * @looker/sdk bumped from 25.4.0 to 25.6.0
+    * @looker/sdk-codegen bumped from 21.9.10 to 21.9.11
+    * @looker/sdk-codegen-utils bumped from 21.0.21 to 21.0.22
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.42 to 0.1.43
+    * @looker/extension-utils bumped from 0.1.52 to 0.1.53
+    * @looker/sdk bumped from 25.6.0 to 25.8.0
+    * @looker/sdk-codegen bumped from 21.9.11 to 21.9.12
+    * @looker/sdk-codegen-utils bumped from 21.0.22 to 21.0.23
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.43 to 0.1.44
+    * @looker/extension-utils bumped from 0.1.53 to 0.1.54
+    * @looker/sdk bumped from 25.8.0 to 25.10.0
+    * @looker/sdk-codegen bumped from 21.9.12 to 21.9.13
+    * @looker/sdk-codegen-utils bumped from 21.0.23 to 21.0.24
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.44 to 0.1.45
+    * @looker/extension-utils bumped from 0.1.54 to 0.1.55
+    * @looker/sdk bumped from 25.10.0 to 25.16.0
+    * @looker/sdk-codegen bumped from 21.9.13 to 21.10.0
+    * @looker/sdk-codegen-utils bumped from 21.0.24 to 21.0.25
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.45 to 0.1.46
+    * @looker/extension-utils bumped from 0.1.55 to 0.1.56
+    * @looker/sdk bumped from 25.16.0 to 25.18.0
+    * @looker/sdk-codegen bumped from 21.10.0 to 21.10.1
+    * @looker/sdk-codegen-utils bumped from 21.0.25 to 21.0.26
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.46 to 0.1.47
+    * @looker/extension-utils bumped from 0.1.56 to 0.1.57
+    * @looker/sdk bumped from 25.18.0 to 25.20.0
+    * @looker/sdk-codegen bumped from 21.10.1 to 21.10.2
+    * @looker/sdk-codegen-utils bumped from 21.0.26 to 21.0.27
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.47 to 0.1.48
+    * @looker/extension-utils bumped from 0.1.57 to 0.1.58
+    * @looker/sdk bumped from 25.20.0 to 26.0.0
+    * @looker/sdk-codegen bumped from 21.10.2 to 21.10.3
+    * @looker/sdk-codegen-utils bumped from 21.0.27 to 21.0.28
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.48 to 0.1.49
+    * @looker/extension-utils bumped from 0.1.58 to 0.1.59
+    * @looker/sdk bumped from 26.0.0 to 26.2.0
+    * @looker/sdk-codegen bumped from 21.10.3 to 21.10.4
+    * @looker/sdk-codegen-utils bumped from 21.0.28 to 21.0.29
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.50 to 0.1.51
+    * @looker/extension-utils bumped from 0.1.60 to 0.1.61
+    * @looker/sdk bumped from 26.4.0 to 26.6.0
+    * @looker/sdk-codegen bumped from 21.11.0 to 21.11.1
+    * @looker/sdk-codegen-utils bumped from 21.0.30 to 21.0.31
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.51 to 0.1.52
+    * @looker/extension-utils bumped from 0.1.61 to 0.1.62
+    * @looker/sdk bumped from 26.6.0 to 26.6.1
+    * @looker/sdk-codegen bumped from 21.11.1 to 21.11.2
+    * @looker/sdk-codegen-utils bumped from 21.0.31 to 21.0.32
+    * @looker/sdk-rtl bumped from 21.6.4 to 21.6.5
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.52 to 0.1.53
+    * @looker/extension-utils bumped from 0.1.62 to 0.1.63
+    * @looker/sdk bumped from 26.6.1 to 26.8.0
+    * @looker/sdk-codegen bumped from 21.11.2 to 21.11.3
+    * @looker/sdk-codegen-utils bumped from 21.0.32 to 21.0.33
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.53 to 0.1.54
+    * @looker/extension-utils bumped from 0.1.63 to 0.1.64
+    * @looker/sdk bumped from 26.8.0 to 26.10.0
+    * @looker/sdk-codegen bumped from 21.11.3 to 21.11.4
+    * @looker/sdk-codegen-utils bumped from 21.0.33 to 21.0.34
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.54 to 0.1.55
+    * @looker/extension-utils bumped from 0.1.64 to 0.1.65
+    * @looker/sdk bumped from 26.10.0 to 26.12.0
+    * @looker/sdk-codegen bumped from 21.11.4 to 26.12.0
+    * @looker/sdk-codegen-utils bumped from 21.0.34 to 21.0.35
+
+## [0.9.83](https://github.com/looker-open-source/sdk-codegen/compare/run-it-v0.9.82...run-it-v0.9.83) (2026-03-11)
+
+
+### Features
+
+* **api-explorer:** render and format form-urlencoded queries as body parameters ([#1648](https://github.com/looker-open-source/sdk-codegen/issues/1648)) ([46eb5c9](https://github.com/looker-open-source/sdk-codegen/commit/46eb5c968098417fe3cfb6cce3adf8bffd21d663))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.49 to 0.1.50
+    * @looker/extension-utils bumped from 0.1.59 to 0.1.60
+    * @looker/sdk bumped from 26.2.0 to 26.4.0
+    * @looker/sdk-codegen bumped from 21.10.4 to 21.11.0
+    * @looker/sdk-codegen-utils bumped from 21.0.29 to 21.0.30
+
 ## [0.9.72](https://github.com/looker-open-source/sdk-codegen/compare/run-it-v0.9.71...run-it-v0.9.72) (2025-02-06)
 
 

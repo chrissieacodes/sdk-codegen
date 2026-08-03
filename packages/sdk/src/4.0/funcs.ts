@@ -25,7 +25,7 @@
  */
 
 /**
- * 469 API methods
+ * 518 API methods
  */
 
 import type {
@@ -46,6 +46,7 @@ import { encodeParam, functionalSdk } from '@looker/sdk-rtl';
 import { sdkVersion } from '../constants';
 import type {
   IAccessToken,
+  IAgent,
   IAlert,
   IAlertNotifications,
   IAlertPatch,
@@ -54,10 +55,14 @@ import type {
   IArtifact,
   IArtifactNamespace,
   IArtifactUsage,
+  IAsyncDeployResponse,
   IBackupConfiguration,
   IBoard,
   IBoardItem,
   IBoardSection,
+  ICertification,
+  IChatMessage,
+  ICIRun,
   IColorCollection,
   IColumnSearch,
   IConnectionFeatures,
@@ -68,7 +73,13 @@ import type {
   IContentSummary,
   IContentValidation,
   IContentView,
+  IConversation,
+  IConversationalAnalyticsChatRequest,
+  IConversationMessage,
   ICostEstimate,
+  ICreateCIRunRequest,
+  ICreateCIRunResponse,
+  ICreateContinuousIntegrationRunRequest,
   ICreateCostEstimate,
   ICreateCredentialsApi3,
   ICreateEmbedUserRequest,
@@ -101,6 +112,7 @@ import type {
   IDBConnection,
   IDBConnectionTestResult,
   IDependencyGraph,
+  IDeployStatusResponse,
   IDialectInfo,
   IDigestEmails,
   IDigestEmailSend,
@@ -120,6 +132,8 @@ import type {
   IGitBranch,
   IGitConnectionTest,
   IGitConnectionTestResult,
+  IGitDiagnosticReport,
+  IGoldenQuery,
   IGroup,
   IGroupHierarchy,
   IGroupIdForGroupInclusion,
@@ -128,10 +142,13 @@ import type {
   IHomepageSection,
   IIntegration,
   IIntegrationHub,
+  IIntegrationHubHealthResult,
   IIntegrationTestResult,
   IInternalHelpResources,
   IInternalHelpResourcesContent,
   IJsonBi,
+  IKdaRequestPayload,
+  IKdaResponsePayload,
   ILDAPConfig,
   ILDAPConfigTestResult,
   ILegacyFeature,
@@ -157,6 +174,7 @@ import type {
   IPermissionSet,
   IProject,
   IProjectFile,
+  IProjectRun,
   IProjectValidation,
   IProjectValidationCache,
   IProjectWorkspace,
@@ -180,6 +198,7 @@ import type {
   IRequestAllUsers,
   IRequestArtifact,
   IRequestArtifactNamespaces,
+  IRequestAsyncDeployRefToProduction,
   IRequestConnectionColumns,
   IRequestConnectionSchemas,
   IRequestConnectionSearchColumns,
@@ -208,12 +227,14 @@ import type {
   IRequestScheduledPlansForDashboard,
   IRequestScheduledPlansForLook,
   IRequestScheduledPlansForLookmlDashboard,
+  IRequestSearchAgents,
   IRequestSearchAlerts,
   IRequestSearchArtifacts,
   IRequestSearchBoards,
   IRequestSearchContent,
   IRequestSearchContentFavorites,
   IRequestSearchContentViews,
+  IRequestSearchConversations,
   IRequestSearchCredentialsEmail,
   IRequestSearchDashboardElements,
   IRequestSearchDashboards,
@@ -221,6 +242,7 @@ import type {
   IRequestSearchGroups,
   IRequestSearchGroupsWithHierarchy,
   IRequestSearchGroupsWithRoles,
+  IRequestSearchLookmlDashboards,
   IRequestSearchLooks,
   IRequestSearchModelSets,
   IRequestSearchPermissionSets,
@@ -233,6 +255,7 @@ import type {
   IRequestSearchUsers,
   IRequestSearchUsersNames,
   IRequestStartPdtBuild,
+  IRequestSyncLookmlDashboard,
   IRequestTagRef,
   IRequestUserAttributeUserValues,
   IRequestUserRoles,
@@ -245,6 +268,7 @@ import type {
   ISchema,
   ISchemaColumns,
   ISchemaTables,
+  IServiceAccount,
   ISession,
   ISessionConfig,
   ISetting,
@@ -276,16 +300,22 @@ import type {
   IWelcomeEmailTest,
   IWhitelabelConfiguration,
   IWorkspace,
+  IWriteAgent,
   IWriteAlert,
   IWriteApiSession,
   IWriteBackupConfiguration,
   IWriteBoard,
   IWriteBoardItem,
   IWriteBoardSection,
+  IWriteCertification,
   IWriteColorCollection,
   IWriteContentFavorite,
   IWriteContentMeta,
+  IWriteConversation,
+  IWriteConversationMessage,
+  IWriteConversationMessages,
   IWriteCreateDashboardFilter,
+  IWriteCredentialsApi3,
   IWriteCredentialsEmail,
   IWriteDashboard,
   IWriteDashboardElement,
@@ -298,6 +328,8 @@ import type {
   IWriteEmbedSecret,
   IWriteExternalOauthApplication,
   IWriteGitBranch,
+  IWriteGitDiagnosticReport,
+  IWriteGoldenQuery,
   IWriteGroup,
   IWriteIntegration,
   IWriteIntegrationHub,
@@ -320,6 +352,7 @@ import type {
   IWriteRole,
   IWriteSamlConfig,
   IWriteScheduledPlan,
+  IWriteServiceAccount,
   IWriteSessionConfig,
   IWriteSetting,
   IWriteSqlInterfaceQueryCreate,
@@ -473,7 +506,7 @@ export const update_alert = async (
 
 /**
  * ### Update select alert fields
- * # Available fields: `owner_id`, `is_disabled`, `disabled_reason`, `is_public`, `threshold`
+ * # Available fields: `owner_id`, `is_disabled`, `disabled_reason`, `is_public`, `threshold`, `enhancements`
  * #
  *
  * PATCH /alerts/{alert_id} -> IAlert
@@ -657,7 +690,7 @@ export const read_alert_notification = async (
 /**
  * ### Present client credentials to obtain an authorization token
  *
- * Looker API implements the OAuth2 [Resource Owner Password Credentials Grant](https://cloud.google.com/looker/docs/r/api/outh2_resource_owner_pc) pattern.
+ * Looker API implements the OAuth2 [Resource Owner Password Credentials Grant](https://docs.cloud.google.com/looker/docs/r/api/outh2_resource_owner_pc) pattern.
  * The client credentials required for this login must be obtained by creating an API key on a user account
  * in the Looker Admin console. The API key consists of a public `client_id` and a private `client_secret`.
  *
@@ -669,8 +702,6 @@ export const read_alert_notification = async (
  * Replace "4QDkCy..." with the `access_token` value returned by `login`.
  * The word `token` is a string literal and must be included exactly as shown.
  *
- * This function can accept `client_id` and `client_secret` parameters as URL query params or as www-form-urlencoded params in the body of the HTTP request. Since there is a small risk that URL parameters may be visible to intermediate nodes on the network route (proxies, routers, etc), passing credentials in the body of the request is considered more secure than URL params.
- *
  * Example of passing credentials in the HTTP request body:
  * ````
  * POST HTTP /login
@@ -679,10 +710,12 @@ export const read_alert_notification = async (
  * client_id=CGc9B7v7J48dQSJvxxx&client_secret=nNVS9cSS3xNpSC9JdsBvvvvv
  * ````
  *
- * ### Best Practice:
- * Always pass credentials in body params. Pass credentials in URL query params **only** when you cannot pass body params due to application, tool, or other limitations.
+ * *NOTICE*
  *
- * For more information and detailed examples of Looker API authorization, see [How to Authenticate to Looker API](https://github.com/looker/looker-sdk-ruby/blob/master/authentication.md).
+ * Pass 'client_id' and 'client_secret' as body parameters.
+ *
+ * The ability to use query parameters for `client_id` and `client_secret` will be deprecated
+ * before the end of 2026.
  *
  * POST /login -> IAccessToken
  *
@@ -698,8 +731,11 @@ export const login = async (
 ): Promise<SDKResponse<IAccessToken, IError>> => {
   return sdk.post<IAccessToken, IError>(
     '/login',
-    { client_id: request.client_id, client_secret: request.client_secret },
     null,
+    new URLSearchParams({
+      client_id: request.client_id,
+      client_secret: request.client_secret,
+    } as unknown as Record<string, string>),
     options
   );
 };
@@ -722,26 +758,27 @@ export const login = async (
  *
  * See 'login' for more detail on the access token and how to use it.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * In [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview) this call will be denied unless all of the following criteria are met:
+ *   1. The calling user is an [API-only Service Account](https://docs.cloud.google.com/looker/docs/looker-core-user-management#creating_an_api-only_service_account) with the Admin role
+ *   2. The target user is an [Embed User type](https://docs.cloud.google.com/looker/docs/r/single-sign-on-embedding)
+ * Regular user types can not be impersonated in [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview). If your application needs to call the API for these users, use OAuth authentication instead.
  *
  * POST /login/{user_id} -> IAccessToken
  *
  * @param sdk IAPIMethods implementation
  * @param user_id Id of user.
- * @param associative When true (default), API calls using the returned access_token are attributed to the admin user who created the access_token. When false, API activity is attributed to the user the access_token runs as. False requires a looker license.
  * @param options one-time API call overrides
  *
  */
 export const login_user = async (
   sdk: IAPIMethods,
   user_id: string,
-  associative?: boolean,
   options?: Partial<ITransportSettings>
 ): Promise<SDKResponse<IAccessToken, IError>> => {
   user_id = encodeParam(user_id);
   return sdk.post<IAccessToken, IError>(
     `/login/${user_id}`,
-    { associative },
+    null,
     null,
     options
   );
@@ -1048,7 +1085,7 @@ export const update_artifacts = async (
  *
  * The value of the `secret` field will be set by Looker and returned.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * POST /embed_config/secrets -> IEmbedSecret
  *
@@ -1073,7 +1110,7 @@ export const create_embed_secret = async (
 /**
  * ### Delete an embed secret.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * DELETE /embed_config/secrets/{embed_secret_id} -> string
  *
@@ -1124,7 +1161,7 @@ export const delete_embed_secret = async (
  * embed url is created. Unknown group_id, user attribute names or model names will be passed through to the output URL.
  * Because of this, **these parameters are not validated** when the API call is made.
  *
- * The [Get Embed Url](https://cloud.google.com/looker/docs/r/get-signed-url) dialog can be used to determine and validate the correct permissions for signing an embed url.
+ * The [Get Embed Url](https://docs.cloud.google.com/looker/docs/r/get-signed-url) dialog can be used to determine and validate the correct permissions for signing an embed url.
  * This dialog also provides the SDK syntax for the API call to make. Alternatively, you can copy the signed URL into the Embed URI Validator text box
  * in `<your looker instance>/admin/embed` to diagnose potential problems.
  *
@@ -1140,7 +1177,7 @@ export const delete_embed_secret = async (
  * encrypted transport.
  *
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * POST /embed/sso_url -> IEmbedUrlResponse
  *
@@ -1169,7 +1206,7 @@ export const create_sso_embed_url = async (
  * This embed URL can then be used to instantiate a Looker embed session in a
  * "Powered by Looker" (PBL) web application.
  *
- * This is similar to Private Embedding (https://cloud.google.com/looker/docs/r/admin/embed/private-embed). Instead of
+ * This is similar to Private Embedding (https://docs.cloud.google.com/looker/docs/r/admin/embed/private-embed). Instead of
  * logging into the Web UI to authenticate, the user has already authenticated against the API to be able to
  * make this call. However, unlike Private Embed where the user has access to any other part of the Looker UI,
  * the embed web session created by requesting the EmbedUrlResponse.url in a browser only has access to
@@ -1188,9 +1225,6 @@ export const create_sso_embed_url = async (
  * Protect this signed URL as you would an access token or password credentials - do not write
  * it to disk, do not pass it to a third party, and only pass it through a secure HTTPS
  * encrypted transport.
- *
- *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * POST /embed/token_url/me -> IEmbedUrlResponse
  *
@@ -1267,7 +1301,7 @@ export const validate_embed_url = async (
  * - Navigation token - lives for 10 minutes. The Looker client will ask for this token once it is loaded into
  *   the iframe.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * POST /embed/cookieless_session/acquire -> IEmbedCookielessSessionAcquireResponse
  *
@@ -1296,7 +1330,7 @@ export const acquire_embed_cookieless_session = async (
  * in the session and session reference data being cleared from the system. This endpoint can be used to log an embed
  * user out of the Looker instance.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * DELETE /embed/cookieless_session/{session_reference_token} -> string
  *
@@ -1335,7 +1369,7 @@ export const delete_embed_cookieless_session = async (
  * the session time to live in the `session_reference_token_ttl` response property. If this property
  * contains a zero, the embed session has expired.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * PUT /embed/cookieless_session/generate_tokens -> IEmbedCookielessSessionGenerateTokensResponse
  *
@@ -1376,9 +1410,9 @@ export const generate_tokens_for_cookieless_session = async (
  *
  * Looker will never return an **auth_password** field. That value can be set, but never retrieved.
  *
- * See the [Looker LDAP docs](https://cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
+ * See the [Looker LDAP docs](https://docs.cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /ldap_config -> ILDAPConfig
  *
@@ -1404,9 +1438,9 @@ export const ldap_config = async (
  *
  * It is **highly** recommended that any LDAP setting changes be tested using the APIs below before being set globally.
  *
- * See the [Looker LDAP docs](https://cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
+ * See the [Looker LDAP docs](https://docs.cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PATCH /ldap_config -> ILDAPConfig
  *
@@ -1448,7 +1482,7 @@ export const update_ldap_config = async (
  *
  * The active LDAP settings are not modified.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /ldap_config/test_connection -> ILDAPConfigTestResult
  *
@@ -1492,7 +1526,7 @@ export const test_ldap_config_connection = async (
  *
  * The active LDAP settings are not modified.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /ldap_config/test_auth -> ILDAPConfigTestResult
  *
@@ -1525,7 +1559,7 @@ export const test_ldap_config_auth = async (
  *
  * The active LDAP settings are not modified.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /ldap_config/test_user_info -> ILDAPConfigTestResult
  *
@@ -1558,7 +1592,7 @@ export const test_ldap_config_user_info = async (
  *
  * The active LDAP settings are not modified.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /ldap_config/test_user_auth -> ILDAPConfigTestResult
  *
@@ -1918,7 +1952,7 @@ export const deactivate_app_user = async (
  *
  * OIDC is enabled or disabled for Looker using the **enabled** field.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /oidc_config -> IOIDCConfig
  *
@@ -1944,7 +1978,7 @@ export const oidc_config = async (
  *
  * It is **highly** recommended that any OIDC setting changes be tested using the APIs below before being set globally.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PATCH /oidc_config -> IOIDCConfig
  *
@@ -1969,7 +2003,7 @@ export const update_oidc_config = async (
 /**
  * ### Get a OIDC test configuration by test_slug.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /oidc_test_configs/{test_slug} -> IOIDCConfig
  *
@@ -1995,7 +2029,7 @@ export const oidc_test_config = async (
 /**
  * ### Delete a OIDC test configuration.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * DELETE /oidc_test_configs/{test_slug} -> string
  *
@@ -2021,7 +2055,7 @@ export const delete_oidc_test_config = async (
 /**
  * ### Create a OIDC test configuration.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /oidc_test_configs -> IOIDCConfig
  *
@@ -2046,7 +2080,7 @@ export const create_oidc_test_config = async (
 /**
  * ### Get password config.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /password_config -> IPasswordConfig
  *
@@ -2069,7 +2103,7 @@ export const password_config = async (
 /**
  * ### Update password config.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PATCH /password_config -> IPasswordConfig
  *
@@ -2094,7 +2128,7 @@ export const update_password_config = async (
 /**
  * ### Force all credentials_email users to reset their login passwords upon their next login.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /password_config/force_password_reset_at_next_login_for_all_users -> string
  *
@@ -2128,7 +2162,7 @@ export const force_password_reset_at_next_login_for_all_users = async (
  *
  * SAML is enabled or disabled for Looker using the **enabled** field.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /saml_config -> ISamlConfig
  *
@@ -2154,7 +2188,7 @@ export const saml_config = async (
  *
  * It is **highly** recommended that any SAML setting changes be tested using the APIs below before being set globally.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PATCH /saml_config -> ISamlConfig
  *
@@ -2179,7 +2213,7 @@ export const update_saml_config = async (
 /**
  * ### Get a SAML test configuration by test_slug.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /saml_test_configs/{test_slug} -> ISamlConfig
  *
@@ -2205,7 +2239,7 @@ export const saml_test_config = async (
 /**
  * ### Delete a SAML test configuration.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * DELETE /saml_test_configs/{test_slug} -> string
  *
@@ -2231,7 +2265,7 @@ export const delete_saml_test_config = async (
 /**
  * ### Create a SAML test configuration.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /saml_test_configs -> ISamlConfig
  *
@@ -2256,7 +2290,7 @@ export const create_saml_test_config = async (
 /**
  * ### Parse the given xml as a SAML IdP metadata document and return the result.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /parse_saml_idp_metadata -> ISamlMetadataParseResult
  *
@@ -2283,7 +2317,7 @@ export const parse_saml_idp_metadata = async (
  * Note that this requires that the url be public or at least at a location where the Looker instance
  * can fetch it without requiring any special authentication.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /fetch_and_parse_saml_idp_metadata -> ISamlMetadataParseResult
  *
@@ -2354,7 +2388,7 @@ export const update_session_config = async (
  *
  * Returns the users that have been added to the Support Access Allowlist
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /support_access/allowlist -> ISupportAccessAllowlistEntry[]
  *
@@ -2381,7 +2415,7 @@ export const get_support_access_allowlist_entries = async (
  *
  * Adds a list of emails to the Allowlist, using the provided reason
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /support_access/allowlist -> ISupportAccessAllowlistEntry[]
  *
@@ -2410,7 +2444,7 @@ export const add_support_access_allowlist_entries = async (
  *
  * Deletes the specified Allowlist Entry Id
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * DELETE /support_access/allowlist/{entry_id} -> string
  *
@@ -2438,7 +2472,7 @@ export const delete_support_access_allowlist_entry = async (
  *
  * Enables Support Access for the provided duration
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /support_access/enable -> ISupportAccessStatus
  *
@@ -2465,7 +2499,7 @@ export const enable_support_access = async (
  *
  * Disables Support Access immediately
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /support_access/disable -> ISupportAccessStatus
  *
@@ -2490,7 +2524,7 @@ export const disable_support_access = async (
  *
  * Returns the current Support Access Status
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /support_access/status -> ISupportAccessStatus
  *
@@ -3485,7 +3519,7 @@ export const create_digest_email_send = async (
  *
  * Returns the list of public egress IP Addresses for a hosted customer's instance
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /public_egress_ip_addresses -> IEgressIpAddresses
  *
@@ -3598,7 +3632,7 @@ export const update_internal_help_resources = async (
 /**
  * ### Get all legacy features.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /legacy_features -> ILegacyFeature[]
  *
@@ -3621,7 +3655,7 @@ export const all_legacy_features = async (
 /**
  * ### Get information about the legacy feature with a specific id.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /legacy_features/{legacy_feature_id} -> ILegacyFeature
  *
@@ -3647,7 +3681,7 @@ export const legacy_feature = async (
 /**
  * ### Update information about the legacy feature with a specific id.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PATCH /legacy_features/{legacy_feature_id} -> ILegacyFeature
  *
@@ -3714,6 +3748,8 @@ export const mobile_settings = async (
  *
  * Available settings are:
  *  - allow_user_timezones
+ *  - auto_certify_lookml_content
+ *  - content_certification_documentation_link
  *  - custom_welcome_email
  *  - data_connector_default_enabled
  *  - dashboard_auto_refresh_restriction
@@ -3721,6 +3757,7 @@ export const mobile_settings = async (
  *  - extension_framework_enabled
  *  - extension_load_url_enabled
  *  - instance_config
+ *  - is_content_certification_enabled
  *  - managed_certificate_uri
  *  - marketplace_auto_install_enabled
  *  - marketplace_automation
@@ -3729,12 +3766,15 @@ export const mobile_settings = async (
  *  - marketplace_site
  *  - onboarding_enabled
  *  - privatelabel_configuration
+ *  - revoke_certification_on_edits
+ *  - automated_mfa_enabled
  *  - timezone
  *  - host_url
  *  - email_domain_allowlist
  *  - embed_cookieless_v2
  *  - embed_enabled
  *  - embed_config
+ *  - mcp_tools
  *
  * GET /setting -> ISetting
  *
@@ -3761,6 +3801,8 @@ export const get_setting = async (
  *
  * Available settings are:
  *  - allow_user_timezones
+ *  - auto_certify_lookml_content
+ *  - content_certification_documentation_link
  *  - custom_welcome_email
  *  - data_connector_default_enabled
  *  - dashboard_auto_refresh_restriction
@@ -3768,6 +3810,7 @@ export const get_setting = async (
  *  - extension_framework_enabled
  *  - extension_load_url_enabled
  *  - instance_config
+ *  - is_content_certification_enabled
  *  - managed_certificate_uri
  *  - marketplace_auto_install_enabled
  *  - marketplace_automation
@@ -3776,12 +3819,15 @@ export const get_setting = async (
  *  - marketplace_site
  *  - onboarding_enabled
  *  - privatelabel_configuration
+ *  - revoke_certification_on_edits
+ *  - automated_mfa_enabled
  *  - timezone
  *  - host_url
  *  - email_domain_allowlist
  *  - embed_cookieless_v2
  *  - embed_enabled
  *  - embed_config
+ *  - mcp_tools
  *
  * See the `Setting` type for more information on the specific values that can be configured.
  *
@@ -4189,8 +4235,10 @@ export const test_connection_config = async (
   body: Partial<IWriteDBConnection>,
   tests?: DelimArray<string>,
   options?: Partial<ITransportSettings>
-): Promise<SDKResponse<IDBConnectionTestResult[], IError>> => {
-  return sdk.put<IDBConnectionTestResult[], IError>(
+): Promise<
+  SDKResponse<IDBConnectionTestResult[], IError | IValidationError>
+> => {
+  return sdk.put<IDBConnectionTestResult[], IError | IValidationError>(
     '/connections/test',
     { tests },
     body,
@@ -4299,6 +4347,32 @@ export const update_external_oauth_application = async (
     `/external_oauth_applications/${client_id}`,
     null,
     body,
+    options
+  );
+};
+
+/**
+ * ### Delete an OAuth Application.
+ *
+ * This is an OAuth Application which Looker uses to access external systems.
+ *
+ * DELETE /external_oauth_applications/{client_id} -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param client_id The client ID of the OAuth App to delete
+ * @param options one-time API call overrides
+ *
+ */
+export const delete_external_oauth_application = async (
+  sdk: IAPIMethods,
+  client_id: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  client_id = encodeParam(client_id);
+  return sdk.delete<string, IError>(
+    `/external_oauth_applications/${client_id}`,
+    null,
+    null,
     options
   );
 };
@@ -4684,6 +4758,8 @@ export const search_content_favorites = async (
       dashboard_id: request.dashboard_id,
       look_id: request.look_id,
       board_id: request.board_id,
+      lookml_dashboard_id: request.lookml_dashboard_id,
+      include_board_items: request.include_board_items,
       limit: request.limit,
       offset: request.offset,
       sorts: request.sorts,
@@ -5181,6 +5257,572 @@ export const vector_thumbnail = async (
 
 //#endregion Content: Manage Content
 
+//#region ConversationalAnalytics: Manage Conversations, Agents and Messages
+
+/**
+ * ### Search Agents
+ *
+ * Returns an array of agent objects that match the specified search criteria.
+ *
+ * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+ *
+ * Get a **single agent** by id with [get_agent()](#!/Agent/get_agent)
+ *
+ * GET /agents/search -> IAgent[]
+ *
+ * @param sdk IAPIMethods implementation
+ * @param request composed interface "IRequestSearchAgents" for complex method parameters
+ * @param options one-time API call overrides
+ *
+ */
+export const search_agents = async (
+  sdk: IAPIMethods,
+  request: IRequestSearchAgents,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IAgent[], IError>> => {
+  return sdk.get<IAgent[], IError>(
+    '/agents/search',
+    {
+      id: request.id,
+      name: request.name,
+      description: request.description,
+      created_by_user_id: request.created_by_user_id,
+      fields: request.fields,
+      limit: request.limit,
+      category: request.category,
+      offset: request.offset,
+      sorts: request.sorts,
+      filter_or: request.filter_or,
+      not_owned_by: request.not_owned_by,
+      deleted: request.deleted,
+      primary_agent_id: request.primary_agent_id,
+    },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Create Agent
+ *
+ * Creates an agent.
+ * Required fields: `name`, `description`, `sources`.
+ *
+ * POST /agents -> IAgent
+ *
+ * @param sdk IAPIMethods implementation
+ * @param body Partial<IWriteAgent>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const create_agent = async (
+  sdk: IAPIMethods,
+  body: Partial<IWriteAgent>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IAgent, IError | IValidationError>> => {
+  return sdk.post<IAgent, IError | IValidationError>(
+    '/agents',
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Delete Agents
+ *
+ * Delete agents.
+ *
+ * DELETE /agents -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param id Agent id. Can be a comma-separated list of ids.
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const delete_agent = async (
+  sdk: IAPIMethods,
+  id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  return sdk.delete<string, IError>('/agents', { id, fields }, null, options);
+};
+
+/**
+ * ### Get Agent
+ *
+ * Get an agent.
+ *
+ * GET /agents/{agent_id} -> IAgent
+ *
+ * @param sdk IAPIMethods implementation
+ * @param agent_id Agent ID
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const get_agent = async (
+  sdk: IAPIMethods,
+  agent_id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IAgent, IError>> => {
+  agent_id = encodeParam(agent_id);
+  return sdk.get<IAgent, IError>(
+    `/agents/${agent_id}`,
+    { fields },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Update Agent
+ *
+ * Update an agent.
+ *
+ * PATCH /agents/{agent_id} -> IAgent
+ *
+ * @param sdk IAPIMethods implementation
+ * @param agent_id Agent ID
+ * @param body Partial<IWriteAgent>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const update_agent = async (
+  sdk: IAPIMethods,
+  agent_id: string,
+  body: Partial<IWriteAgent>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IAgent, IError | IValidationError>> => {
+  agent_id = encodeParam(agent_id);
+  return sdk.patch<IAgent, IError | IValidationError>(
+    `/agents/${agent_id}`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Get All Conversation Messages
+ *
+ * Get all conversation messages.
+ *
+ * GET /conversations/{conversation_id}/messages -> IConversationMessage[]
+ *
+ * @param sdk IAPIMethods implementation
+ * @param conversation_id Conversation ID
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const all_conversation_messages = async (
+  sdk: IAPIMethods,
+  conversation_id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversationMessage[], IError>> => {
+  conversation_id = encodeParam(conversation_id);
+  return sdk.get<IConversationMessage[], IError>(
+    `/conversations/${conversation_id}/messages`,
+    { fields },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Create Conversation Message
+ *
+ * Create one or more conversation messages.
+ * Required fields for each message: `type`, `message`.
+ *
+ * The `order` for a message will be determined based on the highest order for previously saved
+ * messages for the provided `conversation_id`.
+ *
+ * POST /conversations/{conversation_id}/messages -> IConversationMessage[]
+ *
+ * @param sdk IAPIMethods implementation
+ * @param conversation_id Conversation ID
+ * @param body Partial<IWriteConversationMessages>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const create_conversation_message = async (
+  sdk: IAPIMethods,
+  conversation_id: string,
+  body: Partial<IWriteConversationMessages>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversationMessage[], IError | IValidationError>> => {
+  conversation_id = encodeParam(conversation_id);
+  return sdk.post<IConversationMessage[], IError | IValidationError>(
+    `/conversations/${conversation_id}/messages`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Delete Conversation Message
+ *
+ * Delete an conversation message.
+ *
+ * DELETE /conversations/{conversation_id}/messages -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param conversation_id Conversation ID
+ * @param id Conversation message id. Can be a comma-separated list of ids.
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const delete_conversation_message = async (
+  sdk: IAPIMethods,
+  conversation_id: string,
+  id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  conversation_id = encodeParam(conversation_id);
+  return sdk.delete<string, IError>(
+    `/conversations/${conversation_id}/messages`,
+    { id, fields },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Get Conversation Message
+ *
+ * Get a conversation message.
+ *
+ * GET /conversations/{conversation_id}/messages/{message_id} -> IConversationMessage
+ *
+ * @param sdk IAPIMethods implementation
+ * @param conversation_id Conversation ID
+ * @param message_id Conversation Message ID
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const get_conversation_message = async (
+  sdk: IAPIMethods,
+  conversation_id: string,
+  message_id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversationMessage, IError>> => {
+  conversation_id = encodeParam(conversation_id);
+  message_id = encodeParam(message_id);
+  return sdk.get<IConversationMessage, IError>(
+    `/conversations/${conversation_id}/messages/${message_id}`,
+    { fields },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Update Conversation Message
+ *
+ * Update an conversation message.
+ *
+ * PATCH /conversations/{conversation_id}/messages/{message_id} -> IConversationMessage
+ *
+ * @param sdk IAPIMethods implementation
+ * @param conversation_id Conversation ID
+ * @param message_id Conversation Message ID
+ * @param body Partial<IWriteConversationMessage>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const update_conversation_message = async (
+  sdk: IAPIMethods,
+  conversation_id: string,
+  message_id: string,
+  body: Partial<IWriteConversationMessage>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversationMessage, IError | IValidationError>> => {
+  conversation_id = encodeParam(conversation_id);
+  message_id = encodeParam(message_id);
+  return sdk.patch<IConversationMessage, IError | IValidationError>(
+    `/conversations/${conversation_id}/messages/${message_id}`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Search Conversations
+ *
+ * Returns an array of conversation objects that match the specified search criteria.
+ * This will only return conversations owned by the current user.
+ *
+ * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+ *
+ * Get a **single conversation** by id with [get_conversation()](#!/Conversation/get_conversation)
+ *
+ * GET /conversations/search -> IConversation[]
+ *
+ * @param sdk IAPIMethods implementation
+ * @param request composed interface "IRequestSearchConversations" for complex method parameters
+ * @param options one-time API call overrides
+ *
+ */
+export const search_conversations = async (
+  sdk: IAPIMethods,
+  request: IRequestSearchConversations,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversation[], IError>> => {
+  return sdk.get<IConversation[], IError>(
+    '/conversations/search',
+    {
+      id: request.id,
+      name: request.name,
+      agent_id: request.agent_id,
+      fields: request.fields,
+      limit: request.limit,
+      offset: request.offset,
+      sorts: request.sorts,
+      filter_or: request.filter_or,
+      category: request.category,
+      deleted: request.deleted,
+    },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Create Conversation
+ *
+ * Creates a conversation.
+ * Required fields: `name`.
+ *
+ * POST /conversations -> IConversation
+ *
+ * @param sdk IAPIMethods implementation
+ * @param body Partial<IWriteConversation>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const create_conversation = async (
+  sdk: IAPIMethods,
+  body: Partial<IWriteConversation>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversation, IError | IValidationError>> => {
+  return sdk.post<IConversation, IError | IValidationError>(
+    '/conversations',
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Delete Conversations
+ *
+ * Delete conversations.
+ *
+ * DELETE /conversations -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param id Conversation id. Can be a comma-separated list of ids.
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const delete_conversation = async (
+  sdk: IAPIMethods,
+  id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  return sdk.delete<string, IError>(
+    '/conversations',
+    { id, fields },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Get Conversation
+ *
+ * Get an conversation.
+ *
+ * GET /conversations/{conversation_id} -> IConversation
+ *
+ * @param sdk IAPIMethods implementation
+ * @param conversation_id Conversation ID
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const get_conversation = async (
+  sdk: IAPIMethods,
+  conversation_id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversation, IError>> => {
+  conversation_id = encodeParam(conversation_id);
+  return sdk.get<IConversation, IError>(
+    `/conversations/${conversation_id}`,
+    { fields },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Update Conversation
+ *
+ * Update an conversation.
+ *
+ * PATCH /conversations/{conversation_id} -> IConversation
+ *
+ * @param sdk IAPIMethods implementation
+ * @param conversation_id Conversation ID
+ * @param body Partial<IWriteConversation>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const update_conversation = async (
+  sdk: IAPIMethods,
+  conversation_id: string,
+  body: Partial<IWriteConversation>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IConversation, IError | IValidationError>> => {
+  conversation_id = encodeParam(conversation_id);
+  return sdk.patch<IConversation, IError | IValidationError>(
+    `/conversations/${conversation_id}`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ## Takes the latest conversation context (ID and a user message) and
+ * ## returns a list of newly generated system messages.
+ *
+ * POST /conversational_analytics/chat -> IChatMessage[]
+ *
+ * @param sdk IAPIMethods implementation
+ * @param body Partial<IConversationalAnalyticsChatRequest>
+ * @param options one-time API call overrides
+ *
+ */
+export const conversational_analytics_chat = async (
+  sdk: IAPIMethods,
+  body: Partial<IConversationalAnalyticsChatRequest>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IChatMessage[], IError>> => {
+  return sdk.post<IChatMessage[], IError>(
+    '/conversational_analytics/chat',
+    null,
+    body,
+    options
+  );
+};
+
+/**
+ * ### Create Golden Query
+ *
+ * Creates a golden query.
+ *
+ * POST /golden_queries -> IGoldenQuery
+ *
+ * @param sdk IAPIMethods implementation
+ * @param body Partial<IWriteGoldenQuery>
+ * @param options one-time API call overrides
+ *
+ */
+export const create_golden_query = async (
+  sdk: IAPIMethods,
+  body: Partial<IWriteGoldenQuery>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IGoldenQuery, IError | IValidationError>> => {
+  return sdk.post<IGoldenQuery, IError | IValidationError>(
+    '/golden_queries',
+    null,
+    body,
+    options
+  );
+};
+
+/**
+ * ### Update Golden Query
+ *
+ * Updates a golden query.
+ *
+ * PATCH /golden_queries/{golden_query_id} -> IGoldenQuery
+ *
+ * @param sdk IAPIMethods implementation
+ * @param golden_query_id Golden Query ID
+ * @param body Partial<IWriteGoldenQuery>
+ * @param options one-time API call overrides
+ *
+ */
+export const update_golden_query = async (
+  sdk: IAPIMethods,
+  golden_query_id: number,
+  body: Partial<IWriteGoldenQuery>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IGoldenQuery, IError | IValidationError>> => {
+  return sdk.patch<IGoldenQuery, IError | IValidationError>(
+    `/golden_queries/${golden_query_id}`,
+    null,
+    body,
+    options
+  );
+};
+
+/**
+ * ### Delete Golden Query
+ *
+ * Deletes a golden query by ID.
+ *
+ * DELETE /golden_queries/{golden_query_id} -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param golden_query_id Golden Query ID
+ * @param options one-time API call overrides
+ *
+ */
+export const delete_golden_query = async (
+  sdk: IAPIMethods,
+  golden_query_id: number,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  return sdk.delete<string, IError>(
+    `/golden_queries/${golden_query_id}`,
+    null,
+    null,
+    options
+  );
+};
+
+//#endregion ConversationalAnalytics: Manage Conversations, Agents and Messages
+
 //#region Dashboard: Manage Dashboards
 
 /**
@@ -5369,6 +6011,8 @@ export const import_lookml_dashboard = async (
  * Any UDD (a dashboard which exists in the Looker database rather than as a LookML file) which has a `lookml_link_id`
  * property value referring to a LookML dashboard's id (model::dashboardname) will be updated so that it matches the current state of the LookML dashboard.
  *
+ * If the dashboard_ids parameter is specified, only the dashboards with the specified ids will be updated.
+ *
  * For this operation to succeed the user must have permission to view the LookML dashboard, and only linked dashboards
  * that the user has permission to update will be synced.
  *
@@ -5377,24 +6021,20 @@ export const import_lookml_dashboard = async (
  * PATCH /dashboards/{lookml_dashboard_id}/sync -> number[]
  *
  * @param sdk IAPIMethods implementation
- * @param lookml_dashboard_id Id of LookML dashboard, in the form 'model::dashboardname'
- * @param body Partial<IWriteDashboard>
- * @param raw_locale If true, and this dashboard is localized, export it with the raw keys, not localized.
+ * @param request composed interface "Partial<IRequestSyncLookmlDashboard>" for complex method parameters
  * @param options one-time API call overrides
  *
  */
 export const sync_lookml_dashboard = async (
   sdk: IAPIMethods,
-  lookml_dashboard_id: string,
-  body: Partial<IWriteDashboard>,
-  raw_locale?: boolean,
+  request: Partial<IRequestSyncLookmlDashboard>,
   options?: Partial<ITransportSettings>
 ): Promise<SDKResponse<number[], IError | IValidationError>> => {
-  lookml_dashboard_id = encodeParam(lookml_dashboard_id);
+  request.lookml_dashboard_id = encodeParam(request.lookml_dashboard_id);
   return sdk.patch<number[], IError | IValidationError>(
-    `/dashboards/${lookml_dashboard_id}/sync`,
-    { raw_locale },
-    body,
+    `/dashboards/${request.lookml_dashboard_id}/sync`,
+    { raw_locale: request.raw_locale, dashboard_ids: request.dashboard_ids },
+    null,
     options
   );
 };
@@ -5517,6 +6157,66 @@ export const dashboard_aggregate_table_lookml = async (
   return sdk.get<IDashboardAggregateTableLookml, IError>(
     `/dashboards/aggregate_table_lookml/${dashboard_id}`,
     null,
+    null,
+    options
+  );
+};
+
+/**
+ * ### Search LookML Dashboards
+ *
+ * Returns an array of **LookML Dashboard** objects that match the specified search criteria.
+ * Note, this only returns LookML Dashboards in production.
+ *
+ * If multiple search params are given and `filter_or` is FALSE or not specified,
+ * search params are combined in a logical AND operation.
+ * Only rows that match *all* search param criteria will be returned.
+ *
+ * If `filter_or` is TRUE, multiple search params are combined in a logical OR operation.
+ * Results will include rows that match **any** of the search criteria.
+ *
+ * String search params use case-insensitive matching.
+ * String search params can contain `%` and '_' as SQL LIKE pattern match wildcard expressions.
+ * example="dan%" will match "danger" and "Danzig" but not "David"
+ * example="D_m%" will match "Damage" and "dump"
+ *
+ * Integer search params can accept a single value or a comma separated list of values. The multiple
+ * values will be combined under a logical OR operation - results will match at least one of
+ * the given values.
+ *
+ * Most search params can accept "IS NULL" and "NOT NULL" as special expressions to match
+ * or exclude (respectively) rows where the column is null.
+ *
+ * Boolean search params accept only "true" and "false" as values.
+ *
+ *
+ * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+ *
+ * Get a **single LookML dashboard** by id with [dashboard_lookml()](#!/Dashboard/dashboard_lookml)
+ *
+ * GET /dashboards/lookml/search -> IDashboardLookml
+ *
+ * @param sdk IAPIMethods implementation
+ * @param request composed interface "IRequestSearchLookmlDashboards" for complex method parameters
+ * @param options one-time API call overrides
+ *
+ */
+export const search_lookml_dashboards = async (
+  sdk: IAPIMethods,
+  request: IRequestSearchLookmlDashboards,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IDashboardLookml, IError>> => {
+  return sdk.get<IDashboardLookml, IError>(
+    '/dashboards/lookml/search',
+    {
+      folder_id: request.folder_id,
+      title: request.title,
+      content_favorite_id: request.content_favorite_id,
+      fields: request.fields,
+      limit: request.limit,
+      offset: request.offset,
+      sorts: request.sorts,
+    },
     null,
     options
   );
@@ -5669,6 +6369,58 @@ export const copy_dashboard = async (
     `/dashboards/${dashboard_id}/copy`,
     { folder_id },
     null,
+    options
+  );
+};
+
+/**
+ * ### Update dashboard certification
+ *
+ * PATCH /dashboards/{dashboard_id}/certification -> IDashboard
+ *
+ * @param sdk IAPIMethods implementation
+ * @param dashboard_id Dashboard id to update certification.
+ * @param body Partial<IWriteCertification>
+ * @param options one-time API call overrides
+ *
+ */
+export const update_dashboard_certification = async (
+  sdk: IAPIMethods,
+  dashboard_id: string,
+  body: Partial<IWriteCertification>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IDashboard, IError | IValidationError>> => {
+  dashboard_id = encodeParam(dashboard_id);
+  return sdk.patch<IDashboard, IError | IValidationError>(
+    `/dashboards/${dashboard_id}/certification`,
+    null,
+    body,
+    options
+  );
+};
+
+/**
+ * ### Update LookML dashboard certification
+ *
+ * PATCH /dashboards/lookml/{dashboard_id}/certification -> IDashboard
+ *
+ * @param sdk IAPIMethods implementation
+ * @param dashboard_id LookML Dashboard id to update certification.
+ * @param body Partial<IWriteCertification>
+ * @param options one-time API call overrides
+ *
+ */
+export const update_lookml_certification = async (
+  sdk: IAPIMethods,
+  dashboard_id: string,
+  body: Partial<IWriteCertification>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IDashboard, IError | IValidationError>> => {
+  dashboard_id = encodeParam(dashboard_id);
+  return sdk.patch<IDashboard, IError | IValidationError>(
+    `/dashboards/lookml/${dashboard_id}/certification`,
+    null,
+    body,
     options
   );
 };
@@ -6189,6 +6941,55 @@ export const create_dashboard_layout = async (
   return sdk.post<IDashboardLayout, IError | IValidationError>(
     '/dashboard_layouts',
     { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Get Dashboard Filter State
+ * Returns the stored filter state for a given GUID.
+ *
+ * GET /dashboard_filter_state/{guid} -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param guid GUID of the filter state
+ * @param options one-time API call overrides
+ *
+ */
+export const dashboard_filter_state = async (
+  sdk: IAPIMethods,
+  guid: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  guid = encodeParam(guid);
+  return sdk.get<string, IError>(
+    `/dashboard_filter_state/${guid}`,
+    null,
+    null,
+    options
+  );
+};
+
+/**
+ * ### Create Dashboard Filter State
+ * Saves the filter state and returns a GUID.
+ *
+ * POST /dashboard_filter_state -> IDashboard
+ *
+ * @param sdk IAPIMethods implementation
+ * @param body string
+ * @param options one-time API call overrides
+ *
+ */
+export const create_dashboard_filter_state = async (
+  sdk: IAPIMethods,
+  body: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IDashboard, IError | IValidationError>> => {
+  return sdk.post<IDashboard, IError | IValidationError>(
+    '/dashboard_filter_state',
+    null,
     body,
     options
   );
@@ -7462,6 +8263,34 @@ export const delete_integration_hub = async (
 };
 
 /**
+ * Checks to see if the user is able to connect to their integration hub
+ *
+ * GET /integration_hubs/{integration_hub_id}/health -> IIntegrationHubHealthResult
+ *
+ * @param sdk IAPIMethods implementation
+ * @param integration_hub_id Id of integration_hub
+ * @param fields Requested fields.
+ * @param options one-time API call overrides
+ *
+ */
+export const get_integration_hub_health = async (
+  sdk: IAPIMethods,
+  integration_hub_id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<
+  SDKResponse<IIntegrationHubHealthResult, IError | IValidationError>
+> => {
+  integration_hub_id = encodeParam(integration_hub_id);
+  return sdk.get<IIntegrationHubHealthResult, IError | IValidationError>(
+    `/integration_hubs/${integration_hub_id}/health`,
+    { fields },
+    null,
+    options
+  );
+};
+
+/**
  * Accepts the legal agreement for a given integration hub. This only works for integration hubs that have legal_agreement_required set to true and legal_agreement_signed set to false.
  *
  * POST /integration_hubs/{integration_hub_id}/accept_legal_agreement -> IIntegrationHub
@@ -7613,6 +8442,42 @@ export const test_integration = async (
 };
 
 //#endregion Integration: Manage Integrations
+
+//#region KeyDriverAnalysis: Run Key Driver Analysis
+
+/**
+ * ### Analyze Key Drivers
+ *
+ * Identifies the dimensional segments that most significantly drove a metric's change between two time periods.
+ *
+ * Given a data source (a saved query or a model/explore pair), a contribution metric, and a list of
+ * dimensions to analyse, this endpoint compares a test (breach) period against a control (baseline)
+ * period and returns a ranked list of segment-level insights.
+ * Each insight reports the metric value in both periods, the absolute and relative difference,
+ * the unexpected deviation (how much a segment over or under-performed relative to the overall trend),
+ * its proportional contribution to the total change, and its a-priori support (what share of total volume that segment represents).
+ *
+ * POST /internal/kda/analyze -> IKdaResponsePayload
+ *
+ * @param sdk IAPIMethods implementation
+ * @param body Partial<IKdaRequestPayload>
+ * @param options one-time API call overrides
+ *
+ */
+export const run_key_driver_analysis = async (
+  sdk: IAPIMethods,
+  body: Partial<IKdaRequestPayload>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IKdaResponsePayload, IError | IValidationError>> => {
+  return sdk.post<IKdaResponsePayload, IError | IValidationError>(
+    '/internal/kda/analyze',
+    null,
+    body,
+    options
+  );
+};
+
+//#endregion KeyDriverAnalysis: Run Key Driver Analysis
 
 //#region Look: Run and Manage Looks
 
@@ -7961,6 +8826,32 @@ export const move_look = async (
   );
 };
 
+/**
+ * ### Update look certification
+ *
+ * PATCH /looks/{look_id}/certification -> ILook
+ *
+ * @param sdk IAPIMethods implementation
+ * @param look_id Look id to update certification.
+ * @param body Partial<IWriteCertification>
+ * @param options one-time API call overrides
+ *
+ */
+export const update_look_certification = async (
+  sdk: IAPIMethods,
+  look_id: string,
+  body: Partial<IWriteCertification>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ILook, IError | IValidationError>> => {
+  look_id = encodeParam(look_id);
+  return sdk.patch<ILook, IError | IValidationError>(
+    `/looks/${look_id}/certification`,
+    null,
+    body,
+    options
+  );
+};
+
 //#endregion Look: Run and Manage Looks
 
 //#region LookmlModel: Manage LookML Models
@@ -7989,6 +8880,7 @@ export const all_lookml_models = async (
       exclude_empty: request.exclude_empty,
       exclude_hidden: request.exclude_hidden,
       include_internal: request.include_internal,
+      include_self_service: request.include_self_service,
     },
     null,
     options
@@ -8407,6 +9299,128 @@ export const connection_cost_estimate = async (
 //#region Project: Manage Projects
 
 /**
+ * ### Fetches a CI Run.
+ *
+ * This endpoint is deprecated. [Get Continuous Integration Run](#!/Project/get_continuous_integration_run) should be used instead.
+ *
+ * GET /projects/{project_id}/ci/runs/{run_id} -> IProjectRun
+ *
+ * @deprecated
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Project Id
+ * @param run_id Run Id
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const get_ci_run = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  run_id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IProjectRun, IError>> => {
+  project_id = encodeParam(project_id);
+  run_id = encodeParam(run_id);
+  return sdk.get<IProjectRun, IError>(
+    `/projects/${project_id}/ci/runs/${run_id}`,
+    { fields },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Creates a CI Run.
+ *
+ * This endpoint is deprecated. [Create Continuous Integration Run](#!/Project/create_continuous_integration_run) should be used instead.
+ *
+ * POST /projects/{project_id}/ci/run -> ICreateCIRunResponse
+ *
+ * @deprecated
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Project Id
+ * @param body Partial<ICreateCIRunRequest>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const create_ci_run = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  body: Partial<ICreateCIRunRequest>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ICreateCIRunResponse, IError | IValidationError>> => {
+  project_id = encodeParam(project_id);
+  return sdk.post<ICreateCIRunResponse, IError | IValidationError>(
+    `/projects/${project_id}/ci/run`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Creates and queues a Continuous Integration Run.
+ *
+ * POST /projects/{project_id}/continuous_integration/runs -> ICIRun
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Project Id
+ * @param body Partial<ICreateContinuousIntegrationRunRequest>
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const create_continuous_integration_run = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  body: Partial<ICreateContinuousIntegrationRunRequest>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ICIRun, IError | IValidationError>> => {
+  project_id = encodeParam(project_id);
+  return sdk.post<ICIRun, IError | IValidationError>(
+    `/projects/${project_id}/continuous_integration/runs`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Gets a Continuous Integration run.
+ *
+ * GET /projects/{project_id}/continuous_integration/runs/{run_id} -> ICIRun
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Project Id
+ * @param run_id Run Id
+ * @param fields Requested fields
+ * @param options one-time API call overrides
+ *
+ */
+export const get_continuous_integration_run = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  run_id: string,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ICIRun, IError>> => {
+  project_id = encodeParam(project_id);
+  run_id = encodeParam(run_id);
+  return sdk.get<ICIRun, IError>(
+    `/projects/${project_id}/continuous_integration/runs/${run_id}`,
+    { fields },
+    null,
+    options
+  );
+};
+
+/**
  * ### Generate Lockfile for All LookML Dependencies
  *
  *       Git must have been configured, must be in dev mode and deploy permission required
@@ -8648,6 +9662,62 @@ export const deploy_ref_to_production = async (
 };
 
 /**
+ * ### Asynchronously Deploy a Remote Branch or Ref to Production
+ *
+ * Git must have been configured and deploy permission required.
+ * This endpoint kicks off the deploy process and returns immediately.
+ *
+ * Can only specify either a branch or a ref.
+ *
+ * POST /projects/{project_id}/async_deploy_ref_to_production -> IAsyncDeployResponse
+ *
+ * @param sdk IAPIMethods implementation
+ * @param request composed interface "IRequestAsyncDeployRefToProduction" for complex method parameters
+ * @param options one-time API call overrides
+ *
+ */
+export const async_deploy_ref_to_production = async (
+  sdk: IAPIMethods,
+  request: IRequestAsyncDeployRefToProduction,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IAsyncDeployResponse, IError | IValidationError>> => {
+  request.project_id = encodeParam(request.project_id);
+  return sdk.post<IAsyncDeployResponse, IError | IValidationError>(
+    `/projects/${request.project_id}/async_deploy_ref_to_production`,
+    { branch: request.branch, ref: request.ref },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Check Status of Asynchronous Deploy
+ * Get the status of an asynchronous deploy operation.
+ *
+ * GET /projects/{project_id}/deploy_status/{deployment_id} -> IDeployStatusResponse
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Id of project
+ * @param deployment_id Id of deployment
+ * @param options one-time API call overrides
+ *
+ */
+export const async_deploy_status = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  deployment_id: number,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IDeployStatusResponse, IError>> => {
+  project_id = encodeParam(project_id);
+  return sdk.get<IDeployStatusResponse, IError>(
+    `/projects/${project_id}/deploy_status/${deployment_id}`,
+    null,
+    null,
+    options
+  );
+};
+
+/**
  * ### Deploy LookML from this Development Mode Project to Production
  *
  * Git must have been configured, must be in dev mode and deploy permission required
@@ -8829,6 +9899,10 @@ export const project = async (
  * When you modify a project's `git_remote_url`, Looker connects to the remote repository to fetch
  * metadata. The remote git repository MUST be configured with the Looker-generated deploy
  * key for this project prior to setting the project's `git_remote_url`.
+ *
+ * Note that Looker will validate the git connection when the `git_remote_url` is modified.
+ * If Looker cannot connect to the remote repository (e.g. because the deploy key has not
+ * been added), the update will fail with a 400 Bad Request error.
  *
  * To set up a Looker project with a git repository residing on the Looker server (a 'bare' git repo):
  *
@@ -9104,9 +10178,6 @@ export const project_file = async (
 /**
  * ### Get All Git Connection Tests
  *
- * dev mode required.
- *   - Call `update_session` to select the 'dev' workspace.
- *
  * Returns a list of tests which can be run against a project's (or the dependency project for the provided remote_url) git connection. Call [Run Git Connection Test](#!/Project/run_git_connection_test) to execute each test in sequence.
  *
  * Tests are ordered by increasing specificity. Tests should be run in the order returned because later tests require functionality tested by tests earlier in the test list.
@@ -9249,6 +10320,88 @@ export const tag_ref = async (
       tag_message: request.tag_message,
     },
     request.body,
+    options
+  );
+};
+
+/**
+ * ### Initiate Git Diagnosis Suite
+ *
+ * POST /projects/{project_id}/git_diagnostic_report -> IGitDiagnosticReport
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Looker Project ID
+ * @param body Partial<IWriteGitDiagnosticReport>
+ * @param options one-time API call overrides
+ *
+ */
+export const create_git_diagnostic_report = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  body: Partial<IWriteGitDiagnosticReport>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IGitDiagnosticReport, IError | IValidationError>> => {
+  project_id = encodeParam(project_id);
+  return sdk.post<IGitDiagnosticReport, IError | IValidationError>(
+    `/projects/${project_id}/git_diagnostic_report`,
+    null,
+    body,
+    options
+  );
+};
+
+/**
+ * ### Retrieve Live Git Diagnostic Suite Execution Status
+ *
+ * GET /projects/{project_id}/git_diagnostic_report/{report_id} -> IGitDiagnosticReport
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Looker Project ID
+ * @param report_id Report ID
+ * @param options one-time API call overrides
+ *
+ */
+export const get_git_diagnostic_report = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  report_id: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IGitDiagnosticReport, IError>> => {
+  project_id = encodeParam(project_id);
+  report_id = encodeParam(report_id);
+  return sdk.get<IGitDiagnosticReport, IError>(
+    `/projects/${project_id}/git_diagnostic_report/${report_id}`,
+    null,
+    null,
+    options
+  );
+};
+
+/**
+ * ### Repair Git Configuration Issues
+ *
+ * POST /projects/{project_id}/git_diagnostic_report/{report_id}/repair -> IGitDiagnosticReport
+ *
+ * @param sdk IAPIMethods implementation
+ * @param project_id Looker Project ID
+ * @param report_id Report ID
+ * @param body Partial<IWriteGitDiagnosticReport>
+ * @param options one-time API call overrides
+ *
+ */
+export const repair_git_diagnostic_report = async (
+  sdk: IAPIMethods,
+  project_id: string,
+  report_id: string,
+  body: Partial<IWriteGitDiagnosticReport>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IGitDiagnosticReport, IError | IValidationError>> => {
+  project_id = encodeParam(project_id);
+  report_id = encodeParam(report_id);
+  return sdk.post<IGitDiagnosticReport, IError | IValidationError>(
+    `/projects/${project_id}/git_diagnostic_report/${report_id}/repair`,
+    null,
+    body,
     options
   );
 };
@@ -9668,8 +10821,6 @@ export const run_query = async (
       path_prefix: request.path_prefix,
       rebuild_pdts: request.rebuild_pdts,
       server_table_calcs: request.server_table_calcs,
-      source: request.source,
-      enable_oauth_error_response: request.enable_oauth_error_response,
     },
     null,
     options
@@ -9760,7 +10911,6 @@ export const run_inline_query = async (
       path_prefix: request.path_prefix,
       rebuild_pdts: request.rebuild_pdts,
       server_table_calcs: request.server_table_calcs,
-      enable_oauth_error_response: request.enable_oauth_error_response,
     },
     request.body,
     options
@@ -10381,6 +11531,7 @@ export const search_model_sets = async (
       all_access: request.all_access,
       built_in: request.built_in,
       filter_or: request.filter_or,
+      models: request.models,
     },
     null,
     options
@@ -10568,6 +11719,7 @@ export const search_permission_sets = async (
       all_access: request.all_access,
       built_in: request.built_in,
       filter_or: request.filter_or,
+      permissions: request.permissions,
     },
     null,
     options
@@ -10715,7 +11867,11 @@ export const all_roles = async (
 ): Promise<SDKResponse<IRole[], IError>> => {
   return sdk.get<IRole[], IError>(
     '/roles',
-    { fields: request.fields, ids: request.ids },
+    {
+      fields: request.fields,
+      ids: request.ids,
+      get_all_support_roles: request.get_all_support_roles,
+    },
     null,
     options
   );
@@ -10790,10 +11946,11 @@ export const search_roles = async (
       offset: request.offset,
       sorts: request.sorts,
       id: request.id,
+      model_set_ids: request.model_set_ids,
+      permission_set_ids: request.permission_set_ids,
       name: request.name,
       built_in: request.built_in,
       filter_or: request.filter_or,
-      is_support_role: request.is_support_role,
     },
     null,
     options
@@ -10949,7 +12106,7 @@ export const role_groups = async (
 /**
  * ### Set all groups for a role, removing all existing group associations from that role.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PUT /roles/{role_id}/groups -> IGroup[]
  *
@@ -11106,7 +12263,7 @@ export const scheduled_plan = async (
  * #### Email Permissions:
  *
  * For details about permissions required to schedule delivery to email and the safeguards
- * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+ * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
  *
  *
  * #### Scheduled Plan Destination Formats
@@ -11246,7 +12403,7 @@ export const all_scheduled_plans = async (
  *
  * When `run_as_recipient` is `true` and all the email recipients are Looker user accounts, the
  * queries are run in the context of each recipient, so different recipients may see different
- * data from the same scheduled render of a look or dashboard. For more details, see [Run As Recipient](https://cloud.google.com/looker/docs/r/admin/run-as-recipient).
+ * data from the same scheduled render of a look or dashboard. For more details, see [Run As Recipient](https://docs.cloud.google.com/looker/docs/r/admin/run-as-recipient).
  *
  * Admins can create and modify scheduled plans on behalf of other users by specifying a user id.
  * Non-admin users may not create or modify scheduled plans by or for other users.
@@ -11254,7 +12411,7 @@ export const all_scheduled_plans = async (
  * #### Email Permissions:
  *
  * For details about permissions required to schedule delivery to email and the safeguards
- * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+ * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
  *
  *
  * #### Scheduled Plan Destination Formats
@@ -11313,7 +12470,7 @@ export const create_scheduled_plan = async (
  * #### Email Permissions:
  *
  * For details about permissions required to schedule delivery to email and the safeguards
- * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+ * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
  *
  *
  * #### Scheduled Plan Destination Formats
@@ -11542,7 +12699,7 @@ export const scheduled_plans_for_lookml_dashboard = async (
  * #### Email Permissions:
  *
  * For details about permissions required to schedule delivery to email and the safeguards
- * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+ * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
  *
  *
  * #### Scheduled Plan Destination Formats
@@ -11595,6 +12752,86 @@ export const scheduled_plan_run_once_by_id = async (
 };
 
 //#endregion ScheduledPlan: Manage Scheduled Plans
+
+//#region SelfService: Self Service Models
+
+/**
+ * ### Get Allowed Connections under advanced connection governance
+ *
+ * This endpoint returns the list of allowed connection names for self-service models
+ * when advanced connection governance is enabled.
+ *
+ * GET /self_service_models/allowed_connections -> string[]
+ *
+ * @param sdk IAPIMethods implementation
+ * @param google_sheets Include connections allowed for Google Sheets.
+ * @param options one-time API call overrides
+ *
+ */
+export const get_self_service_model_allowed_connections = async (
+  sdk: IAPIMethods,
+  google_sheets?: boolean,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string[], IError>> => {
+  return sdk.get<string[], IError>(
+    '/self_service_models/allowed_connections',
+    { google_sheets },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Get Generated LookML for a Self Service Model
+ *
+ * GET /self_service_models/{model_name}/lookml -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param model_name Name of self service model
+ * @param options one-time API call overrides
+ *
+ */
+export const get_self_service_model_lookml = async (
+  sdk: IAPIMethods,
+  model_name: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  model_name = encodeParam(model_name);
+  return sdk.get<string, IError>(
+    `/self_service_models/${model_name}/lookml`,
+    null,
+    null,
+    options
+  );
+};
+
+/**
+ * ### Update certification for a Self Service Explore
+ *
+ * PATCH /self_service_models/{model_name}/certification -> ICertification
+ *
+ * @param sdk IAPIMethods implementation
+ * @param model_name Name of self service model.
+ * @param body Partial<IWriteCertification>
+ * @param options one-time API call overrides
+ *
+ */
+export const update_self_service_explore_certification = async (
+  sdk: IAPIMethods,
+  model_name: string,
+  body: Partial<IWriteCertification>,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ICertification, IError | IValidationError>> => {
+  model_name = encodeParam(model_name);
+  return sdk.patch<ICertification, IError | IValidationError>(
+    `/self_service_models/${model_name}/certification`,
+    null,
+    body,
+    options
+  );
+};
+
+//#endregion SelfService: Self Service Models
 
 //#region Session: Session Information
 
@@ -11792,7 +13029,7 @@ export const all_themes = async (
  *
  * **Permanently delete** an existing theme with [Delete Theme](#!/Theme/delete_theme)
  *
- * For more information, see [Creating and Applying Themes](https://cloud.google.com/looker/docs/r/admin/themes).
+ * For more information, see [Creating and Applying Themes](https://docs.cloud.google.com/looker/docs/r/admin/themes).
  *
  * **Note**: Custom themes needs to be enabled by Looker. Unless custom themes are enabled, only the automatically generated default theme can be used. Please contact your Account Manager or https://console.cloud.google.com/support/cases/ to update your license for this feature.
  *
@@ -11867,8 +13104,8 @@ export const search_themes = async (
   sdk: IAPIMethods,
   request: IRequestSearchThemes,
   options?: Partial<ITransportSettings>
-): Promise<SDKResponse<ITheme[], IError>> => {
-  return sdk.get<ITheme[], IError>(
+): Promise<SDKResponse<ITheme[], IError | IValidationError>> => {
+  return sdk.get<ITheme[], IError | IValidationError>(
     '/themes/search',
     {
       id: request.id,
@@ -11880,6 +13117,7 @@ export const search_themes = async (
       sorts: request.sorts,
       fields: request.fields,
       filter_or: request.filter_or,
+      theme_type: request.theme_type,
     },
     null,
     options
@@ -11889,6 +13127,8 @@ export const search_themes = async (
 /**
  * ### Get the default theme
  *
+ * This endpoint is deprecated. [Get Default Theme (with type)](#!/Theme/default_theme_by_type) should be used instead.
+ *
  * Returns the active theme object set as the default.
  *
  * The **default** theme name can be set in the UI on the Admin|Theme UI page
@@ -11896,6 +13136,8 @@ export const search_themes = async (
  * The optional `ts` parameter can specify a different timestamp than "now." If specified, it returns the default theme at the time indicated.
  *
  * GET /themes/default -> ITheme
+ *
+ * @deprecated
  *
  * @param sdk IAPIMethods implementation
  * @param ts Timestamp representing the target datetime for the active period. Defaults to 'now'
@@ -11913,6 +13155,8 @@ export const default_theme = async (
 /**
  * ### Set the global default theme by theme name
  *
+ * This endpoint is deprecated. [Set Default Theme (with type)](#!/Theme/set_default_theme_by_type) should be used instead.
+ *
  * Only Admin users can call this function.
  *
  * Only an active theme with no expiration (`end_at` not set) can be assigned as the default theme. As long as a theme has an active record with no expiration, it can be set as the default.
@@ -11924,6 +13168,8 @@ export const default_theme = async (
  * **Note**: Custom themes needs to be enabled by Looker. Unless custom themes are enabled, only the automatically generated default theme can be used. Please contact your Account Manager or https://console.cloud.google.com/support/cases/ to update your license for this feature.
  *
  * PUT /themes/default -> ITheme
+ *
+ * @deprecated
  *
  * @param sdk IAPIMethods implementation
  * @param name Name of theme to set as default
@@ -11938,6 +13184,74 @@ export const set_default_theme = async (
   return sdk.put<ITheme, IError | IValidationError>(
     '/themes/default',
     { name },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Get the default theme
+ *
+ * Returns the active theme object set as the default.
+ *
+ * The **default** theme name can be set in the UI on the Admin|Theme UI page
+ *
+ * The optional `ts` parameter can specify a different timestamp than "now." If specified, it returns the default theme at the time indicated.
+ *
+ * The optional `theme_type` parameter can specify the theme type to select for.
+ *
+ * GET /themes/default_theme -> ITheme
+ *
+ * @param sdk IAPIMethods implementation
+ * @param theme_type Theme type.
+ * @param ts Timestamp representing the target datetime for the active period. Defaults to 'now'
+ * @param options one-time API call overrides
+ *
+ */
+export const default_theme_by_type = async (
+  sdk: IAPIMethods,
+  theme_type: string,
+  ts?: Date,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ITheme, IError | IValidationError>> => {
+  return sdk.get<ITheme, IError | IValidationError>(
+    '/themes/default_theme',
+    { ts, theme_type },
+    null,
+    options
+  );
+};
+
+/**
+ * ### Set the global default theme by theme name
+ *
+ * Only Admin users can call this function.
+ *
+ * Only an active theme with no expiration (`end_at` not set) can be assigned as the default theme. As long as a theme has an active record with no expiration, it can be set as the default.
+ *
+ * [Create Theme](#!/Theme/create) has detailed information on rules for default and active themes
+ *
+ * Returns the new specified default theme object.
+ *
+ * The optional `theme_type` parameter can specify the theme type to select for.
+ *
+ * PUT /themes/default_theme -> ITheme
+ *
+ * @param sdk IAPIMethods implementation
+ * @param name Name of theme to set as default
+ * @param theme_type Theme type.
+ * @param options one-time API call overrides
+ *
+ */
+export const set_default_theme_by_type = async (
+  sdk: IAPIMethods,
+  name: string,
+  theme_type: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ITheme, IError | IValidationError>> => {
+  return sdk.put<ITheme, IError | IValidationError>(
+    '/themes/default_theme',
+    { name, theme_type },
     null,
     options
   );
@@ -11965,10 +13279,15 @@ export const active_themes = async (
   sdk: IAPIMethods,
   request: IRequestActiveThemes,
   options?: Partial<ITransportSettings>
-): Promise<SDKResponse<ITheme[], IError>> => {
-  return sdk.get<ITheme[], IError>(
+): Promise<SDKResponse<ITheme[], IError | IValidationError>> => {
+  return sdk.get<ITheme[], IError | IValidationError>(
     '/themes/active',
-    { name: request.name, ts: request.ts, fields: request.fields },
+    {
+      name: request.name,
+      ts: request.ts,
+      theme_type: request.theme_type,
+      fields: request.fields,
+    },
     null,
     options
   );
@@ -12149,7 +13468,7 @@ export const delete_theme = async (
  * Boolean search params accept only "true" and "false" as values.
  *
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /credentials_email/search -> ICredentialsEmailSearch[]
  *
@@ -12310,6 +13629,7 @@ export const search_users = async (
       id: request.id,
       first_name: request.first_name,
       last_name: request.last_name,
+      full_name: request.full_name,
       verified_looker_employee: request.verified_looker_employee,
       embed_user: request.embed_user,
       email: request.email,
@@ -12317,6 +13637,8 @@ export const search_users = async (
       filter_or: request.filter_or,
       content_metadata_id: request.content_metadata_id,
       group_id: request.group_id,
+      can_manage_api3_creds: request.can_manage_api3_creds,
+      is_service_account: request.is_service_account,
     },
     null,
     options
@@ -12421,7 +13743,19 @@ export const update_user = async (
 /**
  * ### Delete the user with a specific id.
  *
- * **DANGER** this will delete the user and all looks and other information owned by the user.
+ * **This action cannot be undone.** If you want to keep the user's content, we recommend disabling their accounts instead of deleting them.
+ *
+ * Deletion will have the following impact:
+ * * Their reports, Looks and dashboards will be moved to Trash.
+ * * Any public URLs owned by them will no longer work.
+ * * Schedules created by the users or that use their content will be deleted.
+ * * Alerts will continue to run, but will not be visible or editable from the dashboard.
+ *
+ * The user cannot delete themselves.
+ * The last administrator user cannot be deleted.
+ *
+ * Deleting Service Accounts via this endpoint is deprecated and can be blocked in future versions.
+ * Please use the dedicated `delete_service_account` endpoint.
  *
  * DELETE /users/{user_id} -> string
  *
@@ -12469,7 +13803,7 @@ export const delete_user = async (
  *
  * **NOTE**: The 'api' credential type was only used with the legacy Looker query API and is no longer supported. The credential type for API you are currently looking at is 'api3'.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/credential/{credential_type}/{credential_id} -> IUser
  *
@@ -12498,9 +13832,73 @@ export const user_for_credential = async (
 };
 
 /**
+ * ### Update information for a specific service account. This action is restricted to Looker admins.
+ *
+ * This endpoint is exclusively for updating service accounts. To update a regular user, please use the `PATCH /api/3.x/users/:user_id` endpoint instead.
+ *
+ * PATCH /users/service_accounts/{user_id} -> IServiceAccount
+ *
+ * @param sdk IAPIMethods implementation
+ * @param user_id Id of service account
+ * @param body Partial<IWriteServiceAccount>
+ * @param fields Requested fields.
+ * @param options one-time API call overrides
+ *
+ */
+export const update_service_account = async (
+  sdk: IAPIMethods,
+  user_id: string,
+  body: Partial<IWriteServiceAccount>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IServiceAccount, IError | IValidationError>> => {
+  user_id = encodeParam(user_id);
+  return sdk.patch<IServiceAccount, IError | IValidationError>(
+    `/users/service_accounts/${user_id}`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### Delete the service account with a specific id.
+ *
+ * **This action cannot be undone.** If you want to keep the service account's content, we recommend disabling their accounts instead of deleting them.
+ *
+ * Deletion will have the following impact:
+ * * Their reports, Looks and dashboards will be moved to Trash.
+ * * Any public URLs owned by them will no longer work.
+ * * Schedules created by the service account or that use their content will be deleted.
+ * * Alerts will continue to run, but will not be visible or editable from the dashboard.
+ *
+ * The service account cannot delete itself.
+ *
+ * DELETE /users/service_accounts/{user_id} -> string
+ *
+ * @param sdk IAPIMethods implementation
+ * @param user_id Id of service account user
+ * @param options one-time API call overrides
+ *
+ */
+export const delete_service_account = async (
+  sdk: IAPIMethods,
+  user_id: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<string, IError>> => {
+  user_id = encodeParam(user_id);
+  return sdk.delete<string, IError>(
+    `/users/service_accounts/${user_id}`,
+    null,
+    null,
+    options
+  );
+};
+
+/**
  * ### Email/password login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_email -> ICredentialsEmail
  *
@@ -12528,7 +13926,7 @@ export const user_credentials_email = async (
 /**
  * ### Email/password login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /users/{user_id}/credentials_email -> ICredentialsEmail
  *
@@ -12558,7 +13956,7 @@ export const create_user_credentials_email = async (
 /**
  * ### Email/password login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * PATCH /users/{user_id}/credentials_email -> ICredentialsEmail
  *
@@ -12588,7 +13986,7 @@ export const update_user_credentials_email = async (
 /**
  * ### Email/password login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * DELETE /users/{user_id}/credentials_email -> string
  *
@@ -12614,7 +14012,7 @@ export const delete_user_credentials_email = async (
 /**
  * ### Two-factor login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_totp -> ICredentialsTotp
  *
@@ -12642,7 +14040,7 @@ export const user_credentials_totp = async (
 /**
  * ### Two-factor login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /users/{user_id}/credentials_totp -> ICredentialsTotp
  *
@@ -12672,7 +14070,7 @@ export const create_user_credentials_totp = async (
 /**
  * ### Two-factor login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * DELETE /users/{user_id}/credentials_totp -> string
  *
@@ -12698,7 +14096,7 @@ export const delete_user_credentials_totp = async (
 /**
  * ### LDAP login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_ldap -> ICredentialsLDAP
  *
@@ -12726,7 +14124,7 @@ export const user_credentials_ldap = async (
 /**
  * ### LDAP login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * DELETE /users/{user_id}/credentials_ldap -> string
  *
@@ -12751,8 +14149,6 @@ export const delete_user_credentials_ldap = async (
 
 /**
  * ### Google authentication login information for the specified user.
- *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_google -> ICredentialsGoogle
  *
@@ -12780,8 +14176,6 @@ export const user_credentials_google = async (
 /**
  * ### Google authentication login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
- *
  * DELETE /users/{user_id}/credentials_google -> string
  *
  * @param sdk IAPIMethods implementation
@@ -12805,8 +14199,6 @@ export const delete_user_credentials_google = async (
 
 /**
  * ### Saml authentication login information for the specified user.
- *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_saml -> ICredentialsSaml
  *
@@ -12834,8 +14226,6 @@ export const user_credentials_saml = async (
 /**
  * ### Saml authentication login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
- *
  * DELETE /users/{user_id}/credentials_saml -> string
  *
  * @param sdk IAPIMethods implementation
@@ -12859,8 +14249,6 @@ export const delete_user_credentials_saml = async (
 
 /**
  * ### OpenID Connect (OIDC) authentication login information for the specified user.
- *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_oidc -> ICredentialsOIDC
  *
@@ -12888,8 +14276,6 @@ export const user_credentials_oidc = async (
 /**
  * ### OpenID Connect (OIDC) authentication login information for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
- *
  * DELETE /users/{user_id}/credentials_oidc -> string
  *
  * @param sdk IAPIMethods implementation
@@ -12913,8 +14299,6 @@ export const delete_user_credentials_oidc = async (
 
 /**
  * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
- *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_api3/{credentials_api3_id} -> ICredentialsApi3
  *
@@ -12945,7 +14329,36 @@ export const user_credentials_api3 = async (
 /**
  * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * PATCH /users/{user_id}/credentials_api3/{credentials_api3_id} -> ICredentialsApi3
+ *
+ * @param sdk IAPIMethods implementation
+ * @param user_id Id of user
+ * @param credentials_api3_id Id of API Credential
+ * @param body Partial<IWriteCredentialsApi3>
+ * @param fields Requested fields.
+ * @param options one-time API call overrides
+ *
+ */
+export const update_user_credentials_api3 = async (
+  sdk: IAPIMethods,
+  user_id: string,
+  credentials_api3_id: string,
+  body: Partial<IWriteCredentialsApi3>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<ICredentialsApi3, IError | IValidationError>> => {
+  user_id = encodeParam(user_id);
+  credentials_api3_id = encodeParam(credentials_api3_id);
+  return sdk.patch<ICredentialsApi3, IError | IValidationError>(
+    `/users/${user_id}/credentials_api3/${credentials_api3_id}`,
+    { fields },
+    body,
+    options
+  );
+};
+
+/**
+ * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
  *
  * DELETE /users/{user_id}/credentials_api3/{credentials_api3_id} -> string
  *
@@ -12974,8 +14387,6 @@ export const delete_user_credentials_api3 = async (
 /**
  * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
- *
  * GET /users/{user_id}/credentials_api3 -> ICredentialsApi3[]
  *
  * @param sdk IAPIMethods implementation
@@ -13001,8 +14412,6 @@ export const all_user_credentials_api3s = async (
 
 /**
  * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
- *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /users/{user_id}/credentials_api3 -> ICreateCredentialsApi3
  *
@@ -13030,7 +14439,7 @@ export const create_user_credentials_api3 = async (
 /**
  * ### Embed login information for the specified user.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * GET /users/{user_id}/credentials_embed/{credentials_embed_id} -> ICredentialsEmbed
  *
@@ -13061,7 +14470,7 @@ export const user_credentials_embed = async (
 /**
  * ### Embed login information for the specified user.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * DELETE /users/{user_id}/credentials_embed/{credentials_embed_id} -> string
  *
@@ -13090,7 +14499,7 @@ export const delete_user_credentials_embed = async (
 /**
  * ### Embed login information for the specified user.
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * GET /users/{user_id}/credentials_embed -> ICredentialsEmbed[]
  *
@@ -13118,7 +14527,7 @@ export const all_user_credentials_embeds = async (
 /**
  * ### Looker Openid login information for the specified user. Used by Looker Analysts.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/credentials_looker_openid -> ICredentialsLookerOpenid
  *
@@ -13146,7 +14555,7 @@ export const user_credentials_looker_openid = async (
 /**
  * ### Looker Openid login information for the specified user. Used by Looker Analysts.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * DELETE /users/{user_id}/credentials_looker_openid -> string
  *
@@ -13171,8 +14580,6 @@ export const delete_user_credentials_looker_openid = async (
 
 /**
  * ### Web login session for the specified user.
- *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/sessions/{session_id} -> ISession
  *
@@ -13203,8 +14610,6 @@ export const user_session = async (
 /**
  * ### Web login session for the specified user.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
- *
  * DELETE /users/{user_id}/sessions/{session_id} -> string
  *
  * @param sdk IAPIMethods implementation
@@ -13231,8 +14636,6 @@ export const delete_user_session = async (
 
 /**
  * ### Web login session for the specified user.
- *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * GET /users/{user_id}/sessions -> ISession[]
  *
@@ -13268,7 +14671,7 @@ export const all_user_sessions = async (
  * The expire period is always 60 minutes when expires is enabled.
  * This method can be called with an empty body.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /users/{user_id}/credentials_email/password_reset -> ICredentialsEmail
  *
@@ -13462,7 +14865,7 @@ export const delete_user_attribute_user_value = async (
  * Password reset URLs will expire in 60 minutes.
  * This method can be called with an empty body.
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /users/{user_id}/credentials_email/send_password_reset -> ICredentialsEmail
  *
@@ -13496,7 +14899,7 @@ export const send_user_credentials_email_password_reset = async (
  * The user's 'is_disabled' status must be true.
  * If the user has a credential email, they will receive a verification email and the user will be disabled until they verify the email
  *
- * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+ * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
  *
  * POST /users/{user_id}/update_emails -> IUser
  *
@@ -13526,7 +14929,7 @@ export const wipeout_user_emails = async (
 /**
  * Create an embed user from an external user ID
  *
- * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+ * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
  *
  * POST /users/embed_user -> IUserPublic
  *
@@ -13543,6 +14946,31 @@ export const create_embed_user = async (
   return sdk.post<IUserPublic, IError>(
     '/users/embed_user',
     null,
+    body,
+    options
+  );
+};
+
+/**
+ * ### Create a service account with the specified information. This action is restricted to Looker admins.
+ *
+ * POST /users/service_accounts -> IServiceAccount
+ *
+ * @param sdk IAPIMethods implementation
+ * @param body Partial<IWriteServiceAccount>
+ * @param fields Requested fields.
+ * @param options one-time API call overrides
+ *
+ */
+export const create_service_account = async (
+  sdk: IAPIMethods,
+  body: Partial<IWriteServiceAccount>,
+  fields?: string,
+  options?: Partial<ITransportSettings>
+): Promise<SDKResponse<IServiceAccount, IError | IValidationError>> => {
+  return sdk.post<IServiceAccount, IError | IValidationError>(
+    '/users/service_accounts',
+    { fields },
     body,
     options
   );

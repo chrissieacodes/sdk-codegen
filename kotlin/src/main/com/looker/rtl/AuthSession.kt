@@ -25,14 +25,25 @@
 package com.looker.rtl
 
 import com.google.api.client.http.UrlEncodedContent
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.gson.JsonParser
+import java.time.LocalDateTime
 
 open class AuthSession(
     open val apiSettings: ConfigurationProvider,
     open val transport: Transport = Transport(apiSettings),
 ) {
+    companion object {
+        private const val IAP_TOKEN_CACHE_MINUTES = 50L
+    }
+
     var authToken: AuthToken = AuthToken()
     private var sudoToken: AuthToken = AuthToken()
     var sudoId: String = ""
+
+    private var cachedIapToken: String? = null
+    private var iapTokenExpiration: LocalDateTime? = null
+    private var isIapConfigured: Boolean? = null
 
     /** Abstraction of AuthToken retrieval to support sudo mode */
     fun activeToken(): AuthToken {
@@ -57,11 +68,111 @@ open class AuthSession(
      */
     fun authenticate(init: RequestSettings): RequestSettings {
         val headers = init.headers.toMutableMap()
+
+        // Handles Google IAP
+        val iapToken = fetchIapToken()
+        if (iapToken != null) {
+            headers["Proxy-Authorization"] = "Bearer $iapToken"
+        }
+
+        // Handles Looker Identity
         val token = getToken()
         if (token.accessToken.isNotBlank()) {
             headers["Authorization"] = "token ${token.accessToken}"
         }
+
         return init.copy(headers = headers)
+    }
+
+    private val googleCreds by lazy {
+        GoogleCredentials.getApplicationDefault()
+            .createScoped(listOf("https://www.googleapis.com/auth/cloud-platform"))
+    }
+
+    @Synchronized
+    fun fetchIapToken(): String? {
+        if (isIapConfigured == false) return null
+
+        if (cachedIapToken != null && iapTokenExpiration != null) {
+            if (LocalDateTime.now().isBefore(iapTokenExpiration!!.minusMinutes(5))) {
+                return cachedIapToken
+            }
+        }
+
+        val config = apiSettings.readConfig()
+        val audience = config["iap_client_id"]
+        val serviceAccount = config["iap_service_account_email"]
+
+        if (audience.isNullOrBlank() || serviceAccount.isNullOrBlank()) {
+            isIapConfigured = false
+            return null
+        }
+
+        isIapConfigured = true
+
+        return try {
+            googleCreds.refreshIfExpired()
+            val accessToken = googleCreds.accessToken?.tokenValue ?: throw RuntimeException("Failed to obtain Google access token")
+
+            val encodedServiceAccount = java.net.URLEncoder.encode(serviceAccount, java.nio.charset.StandardCharsets.UTF_8)
+            val apiUrl = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$encodedServiceAccount:generateIdToken"
+
+            val includeEmail = true
+            val requestMethod = "POST"
+            val connectTimeout = 5000
+            val readTimeout = 5000
+            val doOutput = true
+
+            val jsonBody = com.google.gson.JsonObject().apply {
+                addProperty("audience", audience)
+                addProperty("includeEmail", includeEmail)
+            }.toString()
+
+            val url = java.net.URL(apiUrl)
+            val connection = url.openConnection() as java.net.HttpURLConnection
+
+            try {
+                connection.requestMethod = requestMethod
+                connection.setRequestProperty("Authorization", "Bearer $accessToken")
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.connectTimeout = connectTimeout
+                connection.readTimeout = readTimeout
+                connection.doOutput = doOutput
+
+                connection.outputStream.use { os ->
+                    val input = jsonBody.toByteArray(Charsets.UTF_8)
+                    os.write(input, 0, input.size)
+                }
+
+                val statusCode = connection.responseCode
+                val responseBody = if (statusCode == 200) {
+                    connection.inputStream.bufferedReader().use { it.readText() }
+                } else {
+                    connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                }
+
+                if (statusCode != 200) {
+                    throw RuntimeException("IAM API Error: $statusCode - $responseBody")
+                }
+
+                val iapJsonObject = JsonParser.parseString(responseBody).asJsonObject
+                val token = iapJsonObject.get("token")?.asString
+                    ?: throw RuntimeException("Could not find token in IAM JSON response")
+
+                cachedIapToken = token
+                iapTokenExpiration = LocalDateTime.now().plusMinutes(IAP_TOKEN_CACHE_MINUTES)
+                token
+            } finally {
+                connection.disconnect()
+            }
+        } catch (e: Exception) {
+            cachedIapToken = null
+            iapTokenExpiration = null
+            throw RuntimeException(
+                "OIDC Token failed for IAP. Ensure your Google credentials are authenticated. Error: ${e.message}",
+                e,
+            )
+        }
     }
 
     fun isSudo(): Boolean = sudoId.isNotBlank() && sudoToken.isActive()
@@ -82,6 +193,9 @@ open class AuthSession(
         sudoId = ""
         authToken.reset()
         sudoToken.reset()
+
+        cachedIapToken = null
+        iapTokenExpiration = null
     }
 
     /**
@@ -136,16 +250,46 @@ open class AuthSession(
                 )
             val params = mapOf(client_id to clientId, client_secret to clientSecret)
             val body = UrlEncodedContent(params)
-            val token =
-                ok<AuthToken>(
+
+            try {
+                val iapToken = fetchIapToken()
+
+                val token = ok<AuthToken>(
                     transport.request<AuthToken>(
                         HttpMethod.POST,
                         "$apiPath/login",
                         emptyMap(),
                         body,
-                    ),
+                    ) { requestSettings ->
+                        val headers = requestSettings.headers.toMutableMap()
+                        iapToken?.let {
+                            headers["Proxy-Authorization"] = "Bearer $it"
+                        }
+                        requestSettings.copy(headers = headers)
+                    },
                 )
-            authToken = token
+                authToken = token
+            } catch (e: Throwable) {
+                val config = apiSettings.readConfig()
+                val isUsingIap =
+                    !config["iap_client_id"].isNullOrBlank() || !config["iap_service_account_email"].isNullOrBlank()
+
+                if (isUsingIap) {
+                    throw RuntimeException(
+                        """Please ensure your Identity-Aware Proxy credentials and your Looker credentials  are correct.
+                        | Underlying Error: ${e.message}
+                        """.trimMargin(),
+                        e,
+                    )
+                } else {
+                    throw RuntimeException(
+                        """Please check your Looker API client_id and client_secret.
+                        | Underlying Error: ${e.message}
+                        """.trimMargin(),
+                        e,
+                    )
+                }
+            }
         }
 
         if (sudoId.isNotBlank()) {
@@ -154,7 +298,7 @@ open class AuthSession(
                 transport.request<AuthToken>(HttpMethod.POST, "/login/$newId") { requestSettings ->
                     val headers = requestSettings.headers.toMutableMap()
                     if (token.accessToken.isNotBlank()) {
-                        headers["Authorization"] = "Bearer ${token.accessToken}"
+                        headers["Authorization"] = "token ${token.accessToken}"
                     }
                     requestSettings.copy(headers = headers)
                 }
@@ -165,14 +309,20 @@ open class AuthSession(
 
     private fun doLogout(): Boolean {
         val token = activeToken()
-        val resp =
-            transport.request<String>(HttpMethod.DELETE, "/logout") {
-                val headers = it.headers.toMutableMap()
-                if (token.accessToken.isNotBlank()) {
-                    headers["Authorization"] = "Bearer ${token.accessToken}"
-                }
-                it.copy(headers = headers)
+        val apiPath = "/api/${apiSettings.apiVersion}"
+
+        val resp = transport.request<Any>(HttpMethod.DELETE, "$apiPath/logout") { requestSettings ->
+            val headers = requestSettings.headers.toMutableMap()
+
+            fetchIapToken()?.let { iapToken ->
+                headers["Proxy-Authorization"] = "Bearer $iapToken"
             }
+
+            if (token.accessToken.isNotBlank()) {
+                headers["Authorization"] = "token ${token.accessToken}"
+            }
+            requestSettings.copy(headers = headers)
+        }
 
         val success =
             when (resp) {

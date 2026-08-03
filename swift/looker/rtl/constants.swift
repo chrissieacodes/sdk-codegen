@@ -51,7 +51,7 @@ extension String {
 }
 
 public struct Constants {
-    public static let lookerVersion = "25.4"
+    public static let lookerVersion = "26.12"
     public static let apiVersion = "4.0"
     public static let defaultApiVersion = "4.0" // Swift requires API 4.0
     public static let sdkVersion = #"\#(apiVersion).\#(lookerVersion)"#
@@ -87,6 +87,13 @@ public typealias StringDictionary<Value> = Dictionary<String, Value>
 public typealias ValueDictionary<K: Hashable, V> = Dictionary<K, V>
 
 public typealias Values = [String: Any?]
+
+public struct FormValues {
+    public var values: Values
+    public init(_ values: Values) {
+        self.values = values
+    }
+}
 
 /// Extension for converting a `String` to `Bool`
 public extension String {

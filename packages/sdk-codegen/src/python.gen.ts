@@ -105,6 +105,7 @@ import warnings
 
 from . import models as mdls
 from ${this.packagePath}.rtl import api_methods
+from ${this.packagePath}.rtl import model
 from ${this.packagePath}.rtl import transport
 
 class ${this.packageName}(api_methods.APIMethods):
@@ -371,17 +372,28 @@ ${this.hooks.join('\n')}
 
   httpArgs(callerIndent: string, method: IMethod): string {
     const currIndent = this.bumper(callerIndent);
+    const body = method.bodyArg ? method.bodyArg : this.nullStr;
+    const query = method.queryArgs.length
+      ? this.argGroup('', method.queryArgs)
+      : this.nullStr;
+    const formArgs = this.assignFormArgs(
+      method,
+      body,
+      query,
+      'transport_options'
+    );
+
     let args = '';
     args = this.argFill(
       args,
-      `${currIndent}transport_options=transport_options`
+      `${currIndent}transport_options=${formArgs.options}`
     );
-    if (method.bodyArg) {
-      args = this.argFill(args, `${currIndent}body=${method.bodyArg}`);
+
+    if (formArgs.body !== this.nullStr) {
+      args = this.argFill(args, `${currIndent}body=${formArgs.body}`);
     }
-    if (method.queryArgs.length) {
-      const queryParams = this.argGroup('', method.queryArgs);
-      args = this.argFill(args, `${currIndent}query_params=${queryParams}`);
+    if (formArgs.query !== this.nullStr) {
+      args = this.argFill(args, `${currIndent}query_params=${formArgs.query}`);
     }
     let returnType = this.methodReturnType(method);
     if (method.responseIsBoth()) {
@@ -431,6 +443,19 @@ ${this.hooks.join('\n')}
       }
     }
     return encodings;
+  }
+
+  assignFormArgs(
+    method: IMethod,
+    body: string,
+    query: string,
+    options: string
+  ): { body: string; query: string; options: string } {
+    if (method.isFormUrlEncoded) {
+      body = `model.URLSearchParams(${query})`;
+      query = this.nullStr;
+    }
+    return { body, query, options };
   }
 
   declareMethod(indent: string, method: IMethod) {
@@ -514,6 +539,7 @@ ${this.hooks.join('\n')}
       any: { default: this.nullStr, name: 'Any' },
       boolean: { default: this.nullStr, name: 'bool' },
       byte: { default: this.nullStr, name: 'bytes' },
+      date: { default: this.nullStr, name: 'datetime.datetime' },
       datetime: { default: this.nullStr, name: 'datetime.datetime' },
       double: { default: this.nullStr, name: 'float' },
       float: { default: this.nullStr, name: 'float' },

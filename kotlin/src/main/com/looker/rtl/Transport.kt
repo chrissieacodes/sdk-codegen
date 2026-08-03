@@ -176,6 +176,7 @@ data class RequestSettings(
     val method: HttpMethod,
     val url: String,
     val headers: Map<String, String> = emptyMap(),
+    val iapToken: String? = null,
 )
 
 typealias Authenticator = (init: RequestSettings) -> RequestSettings
@@ -217,8 +218,10 @@ fun encodeParam(value: Any?): String {
             value.toOffsetDateTime().format(utcFormat)
         } else if (value is Date) {
             value.toInstant().atZone(ZoneOffset.UTC).format(utcFormat)
-        } else {
+        } else if (value is String || value is Number || value is Boolean) {
             "$value"
+        } else {
+            GSON.toJson(value)
         }
     try {
         val decoded = URLDecoder.decode(encoded, utf8)
@@ -376,14 +379,17 @@ open class Transport(
         queryParams: Values = emptyMap(),
         body: Any? = null,
         noinline authenticator: Authenticator? = null,
+        noinline customConfiguration: ((RequestSettings) -> RequestSettings)? = null,
     ): SDKResponse {
         val transport: HttpTransport = initTransport(options)
 
         val finalizedRequestSettings: RequestSettings =
             finalizeRequest(method, path, queryParams, authenticator)
 
+        val settingsWithCustom = customConfiguration?.invoke(finalizedRequestSettings) ?: finalizedRequestSettings
+
         val requestInitializer: HttpRequestInitializer =
-            customInitializer(options, finalizedRequestSettings)
+            customInitializer(options, settingsWithCustom)
         val requestFactory: HttpRequestFactory = transport.createRequestFactory(requestInitializer)
 
         val httpContent: HttpContent? =
@@ -410,8 +416,8 @@ open class Transport(
         val request: HttpRequest =
             requestFactory
                 .buildRequest(
-                    finalizedRequestSettings.method.toString(),
-                    GenericUrl(finalizedRequestSettings.url),
+                    settingsWithCustom.method.toString(),
+                    GenericUrl(settingsWithCustom.url),
                     httpContent,
                 ).setSuppressUserAgentSuffix(true)
 
@@ -449,13 +455,13 @@ open class Transport(
                 SDKResponse.SDKSuccessResponse(rawResult)
             } catch (e: HttpResponseException) {
                 SDKResponse.SDKErrorResponse(
-                    "$method $path $ERROR_BODY: ${e.content}",
+                    "$method $path $ERROR_BODY: ${e.content ?: ""}",
                     method,
                     path,
                     e.statusCode,
                     e.statusMessage,
                     e.headers,
-                    e.content,
+                    e.content ?: "",
                 )
             } catch (e: Exception) {
                 SDKResponse.SDKError(e.message ?: "Something went wrong", e)

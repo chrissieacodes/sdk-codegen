@@ -27,6 +27,7 @@ import collections
 import datetime
 import enum
 import functools
+import inspect
 import keyword
 from typing import Any, Iterable, Optional, Sequence, TypeVar, cast
 
@@ -82,7 +83,7 @@ class Model:
             raise AttributeError(
                 f"'{self.__class__.__name__}' object has no attribute '{key}'"
             )
-        annotation = self.__annotations__[key]
+        annotation = inspect.get_annotations(self.__class__)[key]
         if isinstance(annotation, ForwardRef):
             actual_type = eval(
                 annotation.__forward_arg__, self.__global_context, locals()
@@ -228,3 +229,7 @@ class DelimSequence(collections.UserList, Sequence[T]):
             f"{self.separator.join(str(d) for d in self.data)}"
             f"{self.suffix}"
         )
+
+class URLSearchParams(dict):
+    pass
+

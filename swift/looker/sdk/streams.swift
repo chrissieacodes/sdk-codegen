@@ -25,7 +25,7 @@
  */
 
 /**
- * 469 API methods
+ * 518 API methods
  */
 
 
@@ -167,7 +167,7 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### Update select alert fields
-     * # Available fields: `owner_id`, `is_disabled`, `disabled_reason`, `is_public`, `threshold`
+     * # Available fields: `owner_id`, `is_disabled`, `disabled_reason`, `is_public`, `threshold`, `enhancements`
      * #
      *
      * PATCH /alerts/{alert_id} -> Alert
@@ -324,7 +324,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Present client credentials to obtain an authorization token
      *
-     * Looker API implements the OAuth2 [Resource Owner Password Credentials Grant](https://cloud.google.com/looker/docs/r/api/outh2_resource_owner_pc) pattern.
+     * Looker API implements the OAuth2 [Resource Owner Password Credentials Grant](https://docs.cloud.google.com/looker/docs/r/api/outh2_resource_owner_pc) pattern.
      * The client credentials required for this login must be obtained by creating an API key on a user account
      * in the Looker Admin console. The API key consists of a public `client_id` and a private `client_secret`.
      *
@@ -336,8 +336,6 @@ open class LookerSDKStream: APIMethods {
      * Replace "4QDkCy..." with the `access_token` value returned by `login`.
      * The word `token` is a string literal and must be included exactly as shown.
      *
-     * This function can accept `client_id` and `client_secret` parameters as URL query params or as www-form-urlencoded params in the body of the HTTP request. Since there is a small risk that URL parameters may be visible to intermediate nodes on the network route (proxies, routers, etc), passing credentials in the body of the request is considered more secure than URL params.
-     *
      * Example of passing credentials in the HTTP request body:
      * ````
      * POST HTTP /login
@@ -346,10 +344,12 @@ open class LookerSDKStream: APIMethods {
      * client_id=CGc9B7v7J48dQSJvxxx&client_secret=nNVS9cSS3xNpSC9JdsBvvvvv
      * ````
      *
-     * ### Best Practice:
-     * Always pass credentials in body params. Pass credentials in URL query params **only** when you cannot pass body params due to application, tool, or other limitations.
+     * *NOTICE*
      *
-     * For more information and detailed examples of Looker API authorization, see [How to Authenticate to Looker API](https://github.com/looker/looker-sdk-ruby/blob/master/authentication.md).
+     * Pass 'client_id' and 'client_secret' as body parameters.
+     *
+     * The ability to use query parameters for `client_id` and `client_secret` will be deprecated
+     * before the end of 2026.
      *
      * POST /login -> AccessToken
      */
@@ -364,8 +364,8 @@ open class LookerSDKStream: APIMethods {
         client_secret: String? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
-        let result: SDKResponse<Data, SDKError> = self.post("/login", 
-            ["client_id": client_id, "client_secret": client_secret], nil, options)
+        let result: SDKResponse<Data, SDKError> = self.post("/login", nil, FormValues(
+            ["client_id": client_id, "client_secret": client_secret]), options)
         return result
     }
 
@@ -387,7 +387,10 @@ open class LookerSDKStream: APIMethods {
      *
      * See 'login' for more detail on the access token and how to use it.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * In [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview) this call will be denied unless all of the following criteria are met:
+     *   1. The calling user is an [API-only Service Account](https://docs.cloud.google.com/looker/docs/looker-core-user-management#creating_an_api-only_service_account) with the Admin role
+     *   2. The target user is an [Embed User type](https://docs.cloud.google.com/looker/docs/r/single-sign-on-embedding)
+     * Regular user types can not be impersonated in [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview). If your application needs to call the API for these users, use OAuth authentication instead.
      *
      * POST /login/{user_id} -> AccessToken
      */
@@ -396,15 +399,10 @@ open class LookerSDKStream: APIMethods {
          * @param {String} user_id Id of user.
          */
         _ user_id: String,
-        /**
-         * @param {Bool} associative When true (default), API calls using the returned access_token are attributed to the admin user who created the access_token. When false, API activity is attributed to the user the access_token runs as. False requires a looker license.
-         */
-        associative: Bool? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let path_user_id = encodeParam(user_id)
-        let result: SDKResponse<Data, SDKError> = self.post("/login/\(path_user_id)", 
-            ["associative": associative as Any?], nil, options)
+        let result: SDKResponse<Data, SDKError> = self.post("/login/\(path_user_id)", nil, nil, options)
         return result
     }
 
@@ -709,7 +707,7 @@ open class LookerSDKStream: APIMethods {
      *
      * The value of the `secret` field will be set by Looker and returned.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * POST /embed_config/secrets -> EmbedSecret
      */
@@ -727,7 +725,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Delete an embed secret.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * DELETE /embed_config/secrets/{embed_secret_id} -> String
      */
@@ -771,7 +769,7 @@ open class LookerSDKStream: APIMethods {
      * embed url is created. Unknown group_id, user attribute names or model names will be passed through to the output URL.
      * Because of this, **these parameters are not validated** when the API call is made.
      *
-     * The [Get Embed Url](https://cloud.google.com/looker/docs/r/get-signed-url) dialog can be used to determine and validate the correct permissions for signing an embed url.
+     * The [Get Embed Url](https://docs.cloud.google.com/looker/docs/r/get-signed-url) dialog can be used to determine and validate the correct permissions for signing an embed url.
      * This dialog also provides the SDK syntax for the API call to make. Alternatively, you can copy the signed URL into the Embed URI Validator text box
      * in `<your looker instance>/admin/embed` to diagnose potential problems.
      *
@@ -787,7 +785,7 @@ open class LookerSDKStream: APIMethods {
      * encrypted transport.
      *
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * POST /embed/sso_url -> EmbedUrlResponse
      */
@@ -809,7 +807,7 @@ open class LookerSDKStream: APIMethods {
      * This embed URL can then be used to instantiate a Looker embed session in a
      * "Powered by Looker" (PBL) web application.
      *
-     * This is similar to Private Embedding (https://cloud.google.com/looker/docs/r/admin/embed/private-embed). Instead of
+     * This is similar to Private Embedding (https://docs.cloud.google.com/looker/docs/r/admin/embed/private-embed). Instead of
      * logging into the Web UI to authenticate, the user has already authenticated against the API to be able to
      * make this call. However, unlike Private Embed where the user has access to any other part of the Looker UI,
      * the embed web session created by requesting the EmbedUrlResponse.url in a browser only has access to
@@ -828,9 +826,6 @@ open class LookerSDKStream: APIMethods {
      * Protect this signed URL as you would an access token or password credentials - do not write
      * it to disk, do not pass it to a third party, and only pass it through a secure HTTPS
      * encrypted transport.
-     *
-     *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * POST /embed/token_url/me -> EmbedUrlResponse
      */
@@ -894,7 +889,7 @@ open class LookerSDKStream: APIMethods {
      * - Navigation token - lives for 10 minutes. The Looker client will ask for this token once it is loaded into
      *   the iframe.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * POST /embed/cookieless_session/acquire -> EmbedCookielessSessionAcquireResponse
      */
@@ -916,7 +911,7 @@ open class LookerSDKStream: APIMethods {
      * in the session and session reference data being cleared from the system. This endpoint can be used to log an embed
      * user out of the Looker instance.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * DELETE /embed/cookieless_session/{session_reference_token} -> String
      */
@@ -948,7 +943,7 @@ open class LookerSDKStream: APIMethods {
      * the session time to live in the `session_reference_token_ttl` response property. If this property
      * contains a zero, the embed session has expired.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * PUT /embed/cookieless_session/generate_tokens -> EmbedCookielessSessionGenerateTokensResponse
      */
@@ -979,9 +974,9 @@ open class LookerSDKStream: APIMethods {
      *
      * Looker will never return an **auth_password** field. That value can be set, but never retrieved.
      *
-     * See the [Looker LDAP docs](https://cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
+     * See the [Looker LDAP docs](https://docs.cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /ldap_config -> LDAPConfig
      */
@@ -1003,9 +998,9 @@ open class LookerSDKStream: APIMethods {
      *
      * It is **highly** recommended that any LDAP setting changes be tested using the APIs below before being set globally.
      *
-     * See the [Looker LDAP docs](https://cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
+     * See the [Looker LDAP docs](https://docs.cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PATCH /ldap_config -> LDAPConfig
      */
@@ -1040,7 +1035,7 @@ open class LookerSDKStream: APIMethods {
      *
      * The active LDAP settings are not modified.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /ldap_config/test_connection -> LDAPConfigTestResult
      */
@@ -1077,7 +1072,7 @@ open class LookerSDKStream: APIMethods {
      *
      * The active LDAP settings are not modified.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /ldap_config/test_auth -> LDAPConfigTestResult
      */
@@ -1103,7 +1098,7 @@ open class LookerSDKStream: APIMethods {
      *
      * The active LDAP settings are not modified.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /ldap_config/test_user_info -> LDAPConfigTestResult
      */
@@ -1129,7 +1124,7 @@ open class LookerSDKStream: APIMethods {
      *
      * The active LDAP settings are not modified.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /ldap_config/test_user_auth -> LDAPConfigTestResult
      */
@@ -1429,7 +1424,7 @@ open class LookerSDKStream: APIMethods {
      *
      * OIDC is enabled or disabled for Looker using the **enabled** field.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /oidc_config -> OIDCConfig
      */
@@ -1451,7 +1446,7 @@ open class LookerSDKStream: APIMethods {
      *
      * It is **highly** recommended that any OIDC setting changes be tested using the APIs below before being set globally.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PATCH /oidc_config -> OIDCConfig
      */
@@ -1469,7 +1464,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Get a OIDC test configuration by test_slug.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /oidc_test_configs/{test_slug} -> OIDCConfig
      */
@@ -1488,7 +1483,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Delete a OIDC test configuration.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * DELETE /oidc_test_configs/{test_slug} -> String
      */
@@ -1507,7 +1502,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Create a OIDC test configuration.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /oidc_test_configs -> OIDCConfig
      */
@@ -1525,7 +1520,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Get password config.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /password_config -> PasswordConfig
      */
@@ -1539,7 +1534,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Update password config.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PATCH /password_config -> PasswordConfig
      */
@@ -1557,7 +1552,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Force all credentials_email users to reset their login passwords upon their next login.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /password_config/force_password_reset_at_next_login_for_all_users -> String
      */
@@ -1582,7 +1577,7 @@ open class LookerSDKStream: APIMethods {
      *
      * SAML is enabled or disabled for Looker using the **enabled** field.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /saml_config -> SamlConfig
      */
@@ -1604,7 +1599,7 @@ open class LookerSDKStream: APIMethods {
      *
      * It is **highly** recommended that any SAML setting changes be tested using the APIs below before being set globally.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PATCH /saml_config -> SamlConfig
      */
@@ -1622,7 +1617,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Get a SAML test configuration by test_slug.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /saml_test_configs/{test_slug} -> SamlConfig
      */
@@ -1641,7 +1636,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Delete a SAML test configuration.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * DELETE /saml_test_configs/{test_slug} -> String
      */
@@ -1660,7 +1655,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Create a SAML test configuration.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /saml_test_configs -> SamlConfig
      */
@@ -1678,7 +1673,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Parse the given xml as a SAML IdP metadata document and return the result.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /parse_saml_idp_metadata -> SamlMetadataParseResult
      */
@@ -1698,7 +1693,7 @@ open class LookerSDKStream: APIMethods {
      * Note that this requires that the url be public or at least at a location where the Looker instance
      * can fetch it without requiring any special authentication.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /fetch_and_parse_saml_idp_metadata -> SamlMetadataParseResult
      */
@@ -1746,7 +1741,7 @@ open class LookerSDKStream: APIMethods {
      *
      * Returns the users that have been added to the Support Access Allowlist
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /support_access/allowlist -> [SupportAccessAllowlistEntry]
      */
@@ -1767,7 +1762,7 @@ open class LookerSDKStream: APIMethods {
      *
      * Adds a list of emails to the Allowlist, using the provided reason
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /support_access/allowlist -> [SupportAccessAllowlistEntry]
      */
@@ -1787,7 +1782,7 @@ open class LookerSDKStream: APIMethods {
      *
      * Deletes the specified Allowlist Entry Id
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * DELETE /support_access/allowlist/{entry_id} -> String
      */
@@ -1808,7 +1803,7 @@ open class LookerSDKStream: APIMethods {
      *
      * Enables Support Access for the provided duration
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /support_access/enable -> SupportAccessStatus
      */
@@ -1828,7 +1823,7 @@ open class LookerSDKStream: APIMethods {
      *
      * Disables Support Access immediately
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /support_access/disable -> SupportAccessStatus
      */
@@ -1844,7 +1839,7 @@ open class LookerSDKStream: APIMethods {
      *
      * Returns the current Support Access Status
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /support_access/status -> SupportAccessStatus
      */
@@ -2700,7 +2695,7 @@ open class LookerSDKStream: APIMethods {
      *
      * Returns the list of public egress IP Addresses for a hosted customer's instance
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /public_egress_ip_addresses -> EgressIpAddresses
      */
@@ -2770,7 +2765,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Get all legacy features.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /legacy_features -> [LegacyFeature]
      */
@@ -2784,7 +2779,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Get information about the legacy feature with a specific id.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /legacy_features/{legacy_feature_id} -> LegacyFeature
      */
@@ -2803,7 +2798,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Update information about the legacy feature with a specific id.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PATCH /legacy_features/{legacy_feature_id} -> LegacyFeature
      */
@@ -2852,6 +2847,8 @@ open class LookerSDKStream: APIMethods {
      *
      * Available settings are:
      *  - allow_user_timezones
+     *  - auto_certify_lookml_content
+     *  - content_certification_documentation_link
      *  - custom_welcome_email
      *  - data_connector_default_enabled
      *  - dashboard_auto_refresh_restriction
@@ -2859,6 +2856,7 @@ open class LookerSDKStream: APIMethods {
      *  - extension_framework_enabled
      *  - extension_load_url_enabled
      *  - instance_config
+     *  - is_content_certification_enabled
      *  - managed_certificate_uri
      *  - marketplace_auto_install_enabled
      *  - marketplace_automation
@@ -2867,12 +2865,15 @@ open class LookerSDKStream: APIMethods {
      *  - marketplace_site
      *  - onboarding_enabled
      *  - privatelabel_configuration
+     *  - revoke_certification_on_edits
+     *  - automated_mfa_enabled
      *  - timezone
      *  - host_url
      *  - email_domain_allowlist
      *  - embed_cookieless_v2
      *  - embed_enabled
      *  - embed_config
+     *  - mcp_tools
      *
      * GET /setting -> Setting
      */
@@ -2893,6 +2894,8 @@ open class LookerSDKStream: APIMethods {
      *
      * Available settings are:
      *  - allow_user_timezones
+     *  - auto_certify_lookml_content
+     *  - content_certification_documentation_link
      *  - custom_welcome_email
      *  - data_connector_default_enabled
      *  - dashboard_auto_refresh_restriction
@@ -2900,6 +2903,7 @@ open class LookerSDKStream: APIMethods {
      *  - extension_framework_enabled
      *  - extension_load_url_enabled
      *  - instance_config
+     *  - is_content_certification_enabled
      *  - managed_certificate_uri
      *  - marketplace_auto_install_enabled
      *  - marketplace_automation
@@ -2908,12 +2912,15 @@ open class LookerSDKStream: APIMethods {
      *  - marketplace_site
      *  - onboarding_enabled
      *  - privatelabel_configuration
+     *  - revoke_certification_on_edits
+     *  - automated_mfa_enabled
      *  - timezone
      *  - host_url
      *  - email_domain_allowlist
      *  - embed_cookieless_v2
      *  - embed_enabled
      *  - embed_config
+     *  - mcp_tools
      *
      * See the `Setting` type for more information on the specific values that can be configured.
      *
@@ -3324,6 +3331,25 @@ open class LookerSDKStream: APIMethods {
     }
 
     /**
+     * ### Delete an OAuth Application.
+     *
+     * This is an OAuth Application which Looker uses to access external systems.
+     *
+     * DELETE /external_oauth_applications/{client_id} -> String
+     */
+    public func delete_external_oauth_application(
+        /**
+         * @param {String} client_id The client ID of the OAuth App to delete
+         */
+        _ client_id: String,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_client_id = encodeParam(client_id)
+        let result: SDKResponse<Data, SDKError> = self.delete("/external_oauth_applications/\(path_client_id)", nil, nil, options)
+        return result
+    }
+
+    /**
      * ### Create OAuth User state.
      *
      * POST /external_oauth_applications/user_state -> CreateOAuthApplicationUserStateResponse
@@ -3599,25 +3625,33 @@ open class LookerSDKStream: APIMethods {
          */
         id: String? = nil,
         /**
-         * @param {String} user_id Match user id(s).To create a list of multiple ids, use commas as separators
+         * @param {String} user_id Match user id(s). To create a list of multiple ids, use commas as separators
          */
         user_id: String? = nil,
         /**
-         * @param {String} content_metadata_id Match content metadata id(s).To create a list of multiple ids, use commas as separators
+         * @param {String} content_metadata_id Match content metadata id(s). To create a list of multiple ids, use commas as separators
          */
         content_metadata_id: String? = nil,
         /**
-         * @param {String} dashboard_id Match dashboard id(s).To create a list of multiple ids, use commas as separators
+         * @param {String} dashboard_id Match dashboard id(s). To create a list of multiple ids, use commas as separators
          */
         dashboard_id: String? = nil,
         /**
-         * @param {String} look_id Match look id(s).To create a list of multiple ids, use commas as separators
+         * @param {String} look_id Match look id(s). To create a list of multiple ids, use commas as separators
          */
         look_id: String? = nil,
         /**
-         * @param {String} board_id Match board id(s).To create a list of multiple ids, use commas as separators
+         * @param {String} board_id Match board id(s). To create a list of multiple ids, use commas as separators
          */
         board_id: String? = nil,
+        /**
+         * @param {String} lookml_dashboard_id Match lookml dashboard id(s). To create a list of multiple ids, use commas as separators
+         */
+        lookml_dashboard_id: String? = nil,
+        /**
+         * @param {Bool} include_board_items If true, and board_id is provided, returns the content favorites for all items on the board. If false, returns the content favorite for the board itself.
+         */
+        include_board_items: Bool? = nil,
         /**
          * @param {Int64} limit Number of results to return. (used with offset)
          */
@@ -3641,7 +3675,7 @@ open class LookerSDKStream: APIMethods {
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/content_favorite/search", 
-            ["id": id, "user_id": user_id, "content_metadata_id": content_metadata_id, "dashboard_id": dashboard_id, "look_id": look_id, "board_id": board_id, "limit": limit, "offset": offset, "sorts": sorts, "fields": fields, "filter_or": filter_or as Any?], nil, options)
+            ["id": id, "user_id": user_id, "content_metadata_id": content_metadata_id, "dashboard_id": dashboard_id, "look_id": look_id, "board_id": board_id, "lookml_dashboard_id": lookml_dashboard_id, "include_board_items": include_board_items as Any?, "limit": limit, "offset": offset, "sorts": sorts, "fields": fields, "filter_or": filter_or as Any?], nil, options)
         return result
     }
 
@@ -4135,6 +4169,562 @@ open class LookerSDKStream: APIMethods {
 
 
 
+    // MARK ConversationalAnalytics: Manage Conversations, Agents and Messages
+
+    /**
+     * ### Search Agents
+     *
+     * Returns an array of agent objects that match the specified search criteria.
+     *
+     * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+     *
+     * Get a **single agent** by id with [get_agent()](#!/Agent/get_agent)
+     *
+     * GET /agents/search -> [Agent]
+     */
+    public func search_agents(
+        /**
+         * @param {String} id Match agent id. Can be a comma-separated list of ids.
+         */
+        id: String? = nil,
+        /**
+         * @param {String} name Match agent name.
+         */
+        name: String? = nil,
+        /**
+         * @param {String} description Match agent description.
+         */
+        description: String? = nil,
+        /**
+         * @param {String} created_by_user_id Filter on agents created by a particular user.
+         */
+        created_by_user_id: String? = nil,
+        /**
+         * @param {String} fields Requested fields.
+         */
+        fields: String? = nil,
+        /**
+         * @param {Int64} limit Number of results to return. (used with offset)
+         */
+        limit: Int64? = nil,
+        /**
+         * @param {String} category Filter on agent category. Can be a comma-separated list of categories.
+         */
+        category: String? = nil,
+        /**
+         * @param {Int64} offset Number of results to skip before returning. (used with limit)
+         */
+        offset: Int64? = nil,
+        /**
+         * @param {String} sorts One or more fields to sort by. Sortable fields: [:id, :name, :description, :created_by_user_id, :created_at, :content_metadata_id, :category]
+         */
+        sorts: String? = nil,
+        /**
+         * @param {Bool} filter_or Combine given search criteria in a boolean OR expression
+         */
+        filter_or: Bool? = nil,
+        /**
+         * @param {Bool} not_owned_by Filter out the agents owned by the user passed at the :created_by_user_id params
+         */
+        not_owned_by: Bool? = nil,
+        /**
+         * @param {Bool} deleted Filter on soft deleted agents.
+         */
+        deleted: Bool? = nil,
+        /**
+         * @param {String} primary_agent_id Match workflow agents with a particular primary agent (parent). Pass "null" to find agents with no primary agent.
+         */
+        primary_agent_id: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.get("/agents/search", 
+            ["id": id, "name": name, "description": description, "created_by_user_id": created_by_user_id, "fields": fields, "limit": limit, "category": category, "offset": offset, "sorts": sorts, "filter_or": filter_or as Any?, "not_owned_by": not_owned_by as Any?, "deleted": deleted as Any?, "primary_agent_id": primary_agent_id], nil, options)
+        return result
+    }
+
+    /**
+     * ### Create Agent
+     *
+     * Creates an agent.
+     * Required fields: `name`, `description`, `sources`.
+     *
+     * POST /agents -> Agent
+     */
+    public func create_agent(
+        /**
+         * @param {WriteAgent} body
+         */
+        _ body: WriteAgent,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.post("/agents", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Delete Agents
+     *
+     * Delete agents.
+     *
+     * DELETE /agents -> String
+     */
+    public func delete_agent(
+        /**
+         * @param {String} id Agent id. Can be a comma-separated list of ids.
+         */
+        _ id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.delete("/agents", 
+            ["id": id, "fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Get Agent
+     *
+     * Get an agent.
+     *
+     * GET /agents/{agent_id} -> Agent
+     */
+    public func get_agent(
+        /**
+         * @param {String} agent_id Agent ID
+         */
+        _ agent_id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_agent_id = encodeParam(agent_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/agents/\(path_agent_id)", 
+            ["fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Update Agent
+     *
+     * Update an agent.
+     *
+     * PATCH /agents/{agent_id} -> Agent
+     */
+    public func update_agent(
+        /**
+         * @param {String} agent_id Agent ID
+         */
+        _ agent_id: String,
+        /**
+         * @param {WriteAgent} body
+         */
+        _ body: WriteAgent,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_agent_id = encodeParam(agent_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/agents/\(path_agent_id)", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Get All Conversation Messages
+     *
+     * Get all conversation messages.
+     *
+     * GET /conversations/{conversation_id}/messages -> [ConversationMessage]
+     */
+    public func all_conversation_messages(
+        /**
+         * @param {String} conversation_id Conversation ID
+         */
+        _ conversation_id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_conversation_id = encodeParam(conversation_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/conversations/\(path_conversation_id)/messages", 
+            ["fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Create Conversation Message
+     *
+     * Create one or more conversation messages.
+     * Required fields for each message: `type`, `message`.
+     *
+     * The `order` for a message will be determined based on the highest order for previously saved
+     * messages for the provided `conversation_id`.
+     *
+     * POST /conversations/{conversation_id}/messages -> [ConversationMessage]
+     */
+    public func create_conversation_message(
+        /**
+         * @param {String} conversation_id Conversation ID
+         */
+        _ conversation_id: String,
+        /**
+         * @param {WriteConversationMessages} body
+         */
+        _ body: WriteConversationMessages,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_conversation_id = encodeParam(conversation_id)
+        let result: SDKResponse<Data, SDKError> = self.post("/conversations/\(path_conversation_id)/messages", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Delete Conversation Message
+     *
+     * Delete an conversation message.
+     *
+     * DELETE /conversations/{conversation_id}/messages -> String
+     */
+    public func delete_conversation_message(
+        /**
+         * @param {String} conversation_id Conversation ID
+         */
+        _ conversation_id: String,
+        /**
+         * @param {String} id Conversation message id. Can be a comma-separated list of ids.
+         */
+        _ id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_conversation_id = encodeParam(conversation_id)
+        let result: SDKResponse<Data, SDKError> = self.delete("/conversations/\(path_conversation_id)/messages", 
+            ["id": id, "fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Get Conversation Message
+     *
+     * Get a conversation message.
+     *
+     * GET /conversations/{conversation_id}/messages/{message_id} -> ConversationMessage
+     */
+    public func get_conversation_message(
+        /**
+         * @param {String} conversation_id Conversation ID
+         */
+        _ conversation_id: String,
+        /**
+         * @param {String} message_id Conversation Message ID
+         */
+        _ message_id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_conversation_id = encodeParam(conversation_id)
+        let path_message_id = encodeParam(message_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/conversations/\(path_conversation_id)/messages/\(path_message_id)", 
+            ["fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Update Conversation Message
+     *
+     * Update an conversation message.
+     *
+     * PATCH /conversations/{conversation_id}/messages/{message_id} -> ConversationMessage
+     */
+    public func update_conversation_message(
+        /**
+         * @param {String} conversation_id Conversation ID
+         */
+        _ conversation_id: String,
+        /**
+         * @param {String} message_id Conversation Message ID
+         */
+        _ message_id: String,
+        /**
+         * @param {WriteConversationMessage} body
+         */
+        _ body: WriteConversationMessage,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_conversation_id = encodeParam(conversation_id)
+        let path_message_id = encodeParam(message_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/conversations/\(path_conversation_id)/messages/\(path_message_id)", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Search Conversations
+     *
+     * Returns an array of conversation objects that match the specified search criteria.
+     * This will only return conversations owned by the current user.
+     *
+     * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+     *
+     * Get a **single conversation** by id with [get_conversation()](#!/Conversation/get_conversation)
+     *
+     * GET /conversations/search -> [Conversation]
+     */
+    public func search_conversations(
+        /**
+         * @param {String} id Match conversation id. Can be a comma-separated list of ids.
+         */
+        id: String? = nil,
+        /**
+         * @param {String} name Match conversation name.
+         */
+        name: String? = nil,
+        /**
+         * @param {String} agent_id Match conversations with a particular agent. Pass "null" to find conversations with no agent, or "not null" to find conversations with any agent.
+         */
+        agent_id: String? = nil,
+        /**
+         * @param {String} fields Requested fields.
+         */
+        fields: String? = nil,
+        /**
+         * @param {Int64} limit Number of results to return. (used with offset)
+         */
+        limit: Int64? = nil,
+        /**
+         * @param {Int64} offset Number of results to skip before returning. (used with limit)
+         */
+        offset: Int64? = nil,
+        /**
+         * @param {String} sorts One or more fields to sort by. Sortable fields: [:id, :name, :user_id, :agent_id, :created_at, :updated_at, :category]
+         */
+        sorts: String? = nil,
+        /**
+         * @param {Bool} filter_or Combine given search criteria in a boolean OR expression
+         */
+        filter_or: Bool? = nil,
+        /**
+         * @param {String} category Filter on conversation category. Can be a comma-separated list of categories.
+         */
+        category: String? = nil,
+        /**
+         * @param {Bool} deleted Filter on soft deleted conversations.
+         */
+        deleted: Bool? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.get("/conversations/search", 
+            ["id": id, "name": name, "agent_id": agent_id, "fields": fields, "limit": limit, "offset": offset, "sorts": sorts, "filter_or": filter_or as Any?, "category": category, "deleted": deleted as Any?], nil, options)
+        return result
+    }
+
+    /**
+     * ### Create Conversation
+     *
+     * Creates a conversation.
+     * Required fields: `name`.
+     *
+     * POST /conversations -> Conversation
+     */
+    public func create_conversation(
+        /**
+         * @param {WriteConversation} body
+         */
+        _ body: WriteConversation,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.post("/conversations", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Delete Conversations
+     *
+     * Delete conversations.
+     *
+     * DELETE /conversations -> String
+     */
+    public func delete_conversation(
+        /**
+         * @param {String} id Conversation id. Can be a comma-separated list of ids.
+         */
+        _ id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.delete("/conversations", 
+            ["id": id, "fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Get Conversation
+     *
+     * Get an conversation.
+     *
+     * GET /conversations/{conversation_id} -> Conversation
+     */
+    public func get_conversation(
+        /**
+         * @param {String} conversation_id Conversation ID
+         */
+        _ conversation_id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_conversation_id = encodeParam(conversation_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/conversations/\(path_conversation_id)", 
+            ["fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Update Conversation
+     *
+     * Update an conversation.
+     *
+     * PATCH /conversations/{conversation_id} -> Conversation
+     */
+    public func update_conversation(
+        /**
+         * @param {String} conversation_id Conversation ID
+         */
+        _ conversation_id: String,
+        /**
+         * @param {WriteConversation} body
+         */
+        _ body: WriteConversation,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_conversation_id = encodeParam(conversation_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/conversations/\(path_conversation_id)", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ## Takes the latest conversation context (ID and a user message) and
+     * ## returns a list of newly generated system messages.
+     *
+     * POST /conversational_analytics/chat -> [ChatMessage]
+     */
+    public func conversational_analytics_chat(
+        /**
+         * @param {ConversationalAnalyticsChatRequest} body
+         */
+        _ body: ConversationalAnalyticsChatRequest,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.post("/conversational_analytics/chat", nil, try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Create Golden Query
+     *
+     * Creates a golden query.
+     *
+     * POST /golden_queries -> GoldenQuery
+     */
+    public func create_golden_query(
+        /**
+         * @param {WriteGoldenQuery} body
+         */
+        _ body: WriteGoldenQuery,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.post("/golden_queries", nil, try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Update Golden Query
+     *
+     * Updates a golden query.
+     *
+     * PATCH /golden_queries/{golden_query_id} -> GoldenQuery
+     */
+    public func update_golden_query(
+        /**
+         * @param {Int64} golden_query_id Golden Query ID
+         */
+        _ golden_query_id: Int64,
+        /**
+         * @param {WriteGoldenQuery} body
+         */
+        _ body: WriteGoldenQuery,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_golden_query_id = encodeParam(golden_query_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/golden_queries/\(path_golden_query_id)", nil, try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Delete Golden Query
+     *
+     * Deletes a golden query by ID.
+     *
+     * DELETE /golden_queries/{golden_query_id} -> String
+     */
+    public func delete_golden_query(
+        /**
+         * @param {Int64} golden_query_id Golden Query ID
+         */
+        _ golden_query_id: Int64,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_golden_query_id = encodeParam(golden_query_id)
+        let result: SDKResponse<Data, SDKError> = self.delete("/golden_queries/\(path_golden_query_id)", nil, nil, options)
+        return result
+    }
+
+
+
     // MARK Dashboard: Manage Dashboards
 
     /**
@@ -4293,7 +4883,7 @@ open class LookerSDKStream: APIMethods {
          */
         offset: Int64? = nil,
         /**
-         * @param {String} sorts One or more fields to sort by. Sortable fields: [:title, :user_id, :id, :created_at, :space_id, :folder_id, :description, :view_count, :favorite_count, :slug, :content_favorite_id, :content_metadata_id, :deleted, :deleted_at, :last_viewed_at, :last_accessed_at]
+         * @param {String} sorts One or more fields to sort by. Sortable fields: [:title, :user_id, :id, :created_at, :space_id, :folder_id, :description, :view_count, :favorite_count, :slug, :content_favorite_id, :content_metadata_id, :deleted, :deleted_at, :last_viewed_at, :last_accessed_at, :certification_status]
          */
         sorts: String? = nil,
         /**
@@ -4359,6 +4949,8 @@ open class LookerSDKStream: APIMethods {
      * Any UDD (a dashboard which exists in the Looker database rather than as a LookML file) which has a `lookml_link_id`
      * property value referring to a LookML dashboard's id (model::dashboardname) will be updated so that it matches the current state of the LookML dashboard.
      *
+     * If the dashboard_ids parameter is specified, only the dashboards with the specified ids will be updated.
+     *
      * For this operation to succeed the user must have permission to view the LookML dashboard, and only linked dashboards
      * that the user has permission to update will be synced.
      *
@@ -4372,18 +4964,18 @@ open class LookerSDKStream: APIMethods {
          */
         _ lookml_dashboard_id: String,
         /**
-         * @param {WriteDashboard} body
-         */
-        _ body: WriteDashboard,
-        /**
          * @param {Bool} raw_locale If true, and this dashboard is localized, export it with the raw keys, not localized.
          */
         raw_locale: Bool? = nil,
+        /**
+         * @param {DelimArray<String>} dashboard_ids An array of UDD dashboard IDs to sync. If not specified, all UDD dashboards will be synced.
+         */
+        dashboard_ids: DelimArray<String>? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let path_lookml_dashboard_id = encodeParam(lookml_dashboard_id)
         let result: SDKResponse<Data, SDKError> = self.patch("/dashboards/\(path_lookml_dashboard_id)/sync", 
-            ["raw_locale": raw_locale as Any?], try! self.encode(body), options)
+            ["raw_locale": raw_locale as Any?, "dashboard_ids": dashboard_ids as Any?], nil, options)
         return result
     }
 
@@ -4484,6 +5076,76 @@ open class LookerSDKStream: APIMethods {
     ) -> SDKResponse<Data, SDKError> {
         let path_dashboard_id = encodeParam(dashboard_id)
         let result: SDKResponse<Data, SDKError> = self.get("/dashboards/aggregate_table_lookml/\(path_dashboard_id)", nil, nil, options)
+        return result
+    }
+
+    /**
+     * ### Search LookML Dashboards
+     *
+     * Returns an array of **LookML Dashboard** objects that match the specified search criteria.
+     * Note, this only returns LookML Dashboards in production.
+     *
+     * If multiple search params are given and `filter_or` is FALSE or not specified,
+     * search params are combined in a logical AND operation.
+     * Only rows that match *all* search param criteria will be returned.
+     *
+     * If `filter_or` is TRUE, multiple search params are combined in a logical OR operation.
+     * Results will include rows that match **any** of the search criteria.
+     *
+     * String search params use case-insensitive matching.
+     * String search params can contain `%` and '_' as SQL LIKE pattern match wildcard expressions.
+     * example="dan%" will match "danger" and "Danzig" but not "David"
+     * example="D_m%" will match "Damage" and "dump"
+     *
+     * Integer search params can accept a single value or a comma separated list of values. The multiple
+     * values will be combined under a logical OR operation - results will match at least one of
+     * the given values.
+     *
+     * Most search params can accept "IS NULL" and "NOT NULL" as special expressions to match
+     * or exclude (respectively) rows where the column is null.
+     *
+     * Boolean search params accept only "true" and "false" as values.
+     *
+     *
+     * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+     *
+     * Get a **single LookML dashboard** by id with [dashboard_lookml()](#!/Dashboard/dashboard_lookml)
+     *
+     * GET /dashboards/lookml/search -> DashboardLookml
+     */
+    public func search_lookml_dashboards(
+        /**
+         * @param {String} folder_id Filter on a particular folder.
+         */
+        folder_id: String? = nil,
+        /**
+         * @param {String} title Match LookML Dashboard title.
+         */
+        title: String? = nil,
+        /**
+         * @param {String} content_favorite_id Filter on a content favorite id.
+         */
+        content_favorite_id: String? = nil,
+        /**
+         * @param {String} fields Requested fields.
+         */
+        fields: String? = nil,
+        /**
+         * @param {Int64} limit Number of results to return. (used with offset and takes priority over page and per_page)
+         */
+        limit: Int64? = nil,
+        /**
+         * @param {Int64} offset Number of results to skip before returning any. (used with limit and takes priority over page and per_page)
+         */
+        offset: Int64? = nil,
+        /**
+         * @param {String} sorts One or more fields to sort by. Sortable fields: [:title, :id, :folder_id, :content_favorite_id, :content_metadata_id, :certification_status]
+         */
+        sorts: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.get("/dashboards/lookml/search", 
+            ["folder_id": folder_id, "title": title, "content_favorite_id": content_favorite_id, "fields": fields, "limit": limit, "offset": offset, "sorts": sorts], nil, options)
         return result
     }
 
@@ -4606,6 +5268,48 @@ open class LookerSDKStream: APIMethods {
         let path_dashboard_id = encodeParam(dashboard_id)
         let result: SDKResponse<Data, SDKError> = self.post("/dashboards/\(path_dashboard_id)/copy", 
             ["folder_id": folder_id], nil, options)
+        return result
+    }
+
+    /**
+     * ### Update dashboard certification
+     *
+     * PATCH /dashboards/{dashboard_id}/certification -> Dashboard
+     */
+    public func update_dashboard_certification(
+        /**
+         * @param {String} dashboard_id Dashboard id to update certification.
+         */
+        _ dashboard_id: String,
+        /**
+         * @param {WriteCertification} body
+         */
+        _ body: WriteCertification,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_dashboard_id = encodeParam(dashboard_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/dashboards/\(path_dashboard_id)/certification", nil, try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Update LookML dashboard certification
+     *
+     * PATCH /dashboards/lookml/{dashboard_id}/certification -> Dashboard
+     */
+    public func update_lookml_certification(
+        /**
+         * @param {String} dashboard_id LookML Dashboard id to update certification.
+         */
+        _ dashboard_id: String,
+        /**
+         * @param {WriteCertification} body
+         */
+        _ body: WriteCertification,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_dashboard_id = encodeParam(dashboard_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/dashboards/lookml/\(path_dashboard_id)/certification", nil, try! self.encode(body), options)
         return result
     }
 
@@ -5068,6 +5772,41 @@ open class LookerSDKStream: APIMethods {
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.post("/dashboard_layouts", 
             ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Get Dashboard Filter State
+     * Returns the stored filter state for a given GUID.
+     *
+     * GET /dashboard_filter_state/{guid} -> String
+     */
+    public func dashboard_filter_state(
+        /**
+         * @param {String} guid GUID of the filter state
+         */
+        _ guid: String,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_guid = encodeParam(guid)
+        let result: SDKResponse<Data, SDKError> = self.get("/dashboard_filter_state/\(path_guid)", nil, nil, options)
+        return result
+    }
+
+    /**
+     * ### Create Dashboard Filter State
+     * Saves the filter state and returns a GUID.
+     *
+     * POST /dashboard_filter_state -> Dashboard
+     */
+    public func create_dashboard_filter_state(
+        /**
+         * @param {String} body
+         */
+        _ body: String,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.post("/dashboard_filter_state", nil, try! self.encode(body), options)
         return result
     }
 
@@ -6325,6 +7064,28 @@ open class LookerSDKStream: APIMethods {
     }
 
     /**
+     * Checks to see if the user is able to connect to their integration hub
+     *
+     * GET /integration_hubs/{integration_hub_id}/health -> IntegrationHubHealthResult
+     */
+    public func get_integration_hub_health(
+        /**
+         * @param {String} integration_hub_id Id of integration_hub
+         */
+        _ integration_hub_id: String,
+        /**
+         * @param {String} fields Requested fields.
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_integration_hub_id = encodeParam(integration_hub_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/integration_hubs/\(path_integration_hub_id)/health", 
+            ["fields": fields], nil, options)
+        return result
+    }
+
+    /**
      * Accepts the legal agreement for a given integration hub. This only works for integration hubs that have legal_agreement_required set to true and legal_agreement_signed set to false.
      *
      * POST /integration_hubs/{integration_hub_id}/accept_legal_agreement -> IntegrationHub
@@ -6445,6 +7206,35 @@ open class LookerSDKStream: APIMethods {
     ) -> SDKResponse<Data, SDKError> {
         let path_integration_id = encodeParam(integration_id)
         let result: SDKResponse<Data, SDKError> = self.post("/integrations/\(path_integration_id)/test", nil, nil, options)
+        return result
+    }
+
+
+
+    // MARK KeyDriverAnalysis: Run Key Driver Analysis
+
+    /**
+     * ### Analyze Key Drivers
+     *
+     * Identifies the dimensional segments that most significantly drove a metric's change between two time periods.
+     *
+     * Given a data source (a saved query or a model/explore pair), a contribution metric, and a list of
+     * dimensions to analyse, this endpoint compares a test (breach) period against a control (baseline)
+     * period and returns a ranked list of segment-level insights.
+     * Each insight reports the metric value in both periods, the absolute and relative difference,
+     * the unexpected deviation (how much a segment over or under-performed relative to the overall trend),
+     * its proportional contribution to the total change, and its a-priori support (what share of total volume that segment represents).
+     *
+     * POST /internal/kda/analyze -> KdaResponsePayload
+     */
+    public func run_key_driver_analysis(
+        /**
+         * @param {KdaRequestPayload} body
+         */
+        _ body: KdaRequestPayload,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.post("/internal/kda/analyze", nil, try! self.encode(body), options)
         return result
     }
 
@@ -6599,7 +7389,7 @@ open class LookerSDKStream: APIMethods {
          */
         offset: Int64? = nil,
         /**
-         * @param {String} sorts One or more fields to sort results by. Sortable fields: [:title, :user_id, :id, :created_at, :space_id, :folder_id, :description, :updated_at, :last_updater_id, :view_count, :favorite_count, :content_favorite_id, :deleted, :deleted_at, :last_viewed_at, :last_accessed_at, :query_id]
+         * @param {String} sorts One or more fields to sort results by. Sortable fields: [:title, :user_id, :id, :created_at, :space_id, :folder_id, :description, :updated_at, :last_updater_id, :view_count, :favorite_count, :content_favorite_id, :deleted, :deleted_at, :last_viewed_at, :last_accessed_at, :query_id, :certification_status]
          */
         sorts: String? = nil,
         /**
@@ -6851,6 +7641,27 @@ open class LookerSDKStream: APIMethods {
         return result
     }
 
+    /**
+     * ### Update look certification
+     *
+     * PATCH /looks/{look_id}/certification -> Look
+     */
+    public func update_look_certification(
+        /**
+         * @param {String} look_id Look id to update certification.
+         */
+        _ look_id: String,
+        /**
+         * @param {WriteCertification} body
+         */
+        _ body: WriteCertification,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_look_id = encodeParam(look_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/looks/\(path_look_id)/certification", nil, try! self.encode(body), options)
+        return result
+    }
+
 
 
     // MARK LookmlModel: Manage LookML Models
@@ -6885,10 +7696,14 @@ open class LookerSDKStream: APIMethods {
          * @param {Bool} include_internal Whether or not to include built-in models such as System Activity (Defaults to false)
          */
         include_internal: Bool? = nil,
+        /**
+         * @param {Bool} include_self_service Whether or not to include self service models (Defaults to false)
+         */
+        include_self_service: Bool? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/lookml_models", 
-            ["fields": fields, "limit": limit, "offset": offset, "exclude_empty": exclude_empty as Any?, "exclude_hidden": exclude_hidden as Any?, "include_internal": include_internal as Any?], nil, options)
+            ["fields": fields, "limit": limit, "offset": offset, "exclude_empty": exclude_empty as Any?, "exclude_hidden": exclude_hidden as Any?, "include_internal": include_internal as Any?, "include_self_service": include_self_service as Any?], nil, options)
         return result
     }
 
@@ -7305,6 +8120,118 @@ open class LookerSDKStream: APIMethods {
     // MARK Project: Manage Projects
 
     /**
+     * ### Fetches a CI Run.
+     *
+     * This endpoint is deprecated. [Get Continuous Integration Run](#!/Project/get_continuous_integration_run) should be used instead.
+     *
+     * GET /projects/{project_id}/ci/runs/{run_id} -> ProjectRun
+     */
+    @available(*, deprecated)
+    public func get_ci_run(
+        /**
+         * @param {String} project_id Project Id
+         */
+        _ project_id: String,
+        /**
+         * @param {String} run_id Run Id
+         */
+        _ run_id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let path_run_id = encodeParam(run_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/projects/\(path_project_id)/ci/runs/\(path_run_id)", 
+            ["fields": fields], nil, options)
+        return result
+    }
+
+    /**
+     * ### Creates a CI Run.
+     *
+     * This endpoint is deprecated. [Create Continuous Integration Run](#!/Project/create_continuous_integration_run) should be used instead.
+     *
+     * POST /projects/{project_id}/ci/run -> CreateCIRunResponse
+     */
+    @available(*, deprecated)
+    public func create_ci_run(
+        /**
+         * @param {String} project_id Project Id
+         */
+        _ project_id: String,
+        /**
+         * @param {CreateCIRunRequest} body
+         */
+        _ body: CreateCIRunRequest,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let result: SDKResponse<Data, SDKError> = self.post("/projects/\(path_project_id)/ci/run", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Creates and queues a Continuous Integration Run.
+     *
+     * POST /projects/{project_id}/continuous_integration/runs -> CIRun
+     */
+    public func create_continuous_integration_run(
+        /**
+         * @param {String} project_id Project Id
+         */
+        _ project_id: String,
+        /**
+         * @param {CreateContinuousIntegrationRunRequest} body
+         */
+        _ body: CreateContinuousIntegrationRunRequest,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let result: SDKResponse<Data, SDKError> = self.post("/projects/\(path_project_id)/continuous_integration/runs", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Gets a Continuous Integration run.
+     *
+     * GET /projects/{project_id}/continuous_integration/runs/{run_id} -> CIRun
+     */
+    public func get_continuous_integration_run(
+        /**
+         * @param {String} project_id Project Id
+         */
+        _ project_id: String,
+        /**
+         * @param {String} run_id Run Id
+         */
+        _ run_id: String,
+        /**
+         * @param {String} fields Requested fields
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let path_run_id = encodeParam(run_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/projects/\(path_project_id)/continuous_integration/runs/\(path_run_id)", 
+            ["fields": fields], nil, options)
+        return result
+    }
+
+    /**
      * ### Generate Lockfile for All LookML Dependencies
      *
      *       Git must have been configured, must be in dev mode and deploy permission required
@@ -7510,6 +8437,60 @@ open class LookerSDKStream: APIMethods {
     }
 
     /**
+     * ### Asynchronously Deploy a Remote Branch or Ref to Production
+     *
+     * Git must have been configured and deploy permission required.
+     * This endpoint kicks off the deploy process and returns immediately.
+     *
+     * Can only specify either a branch or a ref.
+     *
+     * POST /projects/{project_id}/async_deploy_ref_to_production -> AsyncDeployResponse
+     */
+    public func async_deploy_ref_to_production(
+        /**
+         * @param {String} project_id Id of project
+         */
+        _ project_id: String,
+        /**
+         * @param {String} branch Branch to deploy to production
+         */
+        branch: String? = nil,
+        /**
+         * @param {String} ref Ref to deploy to production
+         */
+        ref: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let result: SDKResponse<Data, SDKError> = self.post("/projects/\(path_project_id)/async_deploy_ref_to_production", 
+            ["branch": branch, "ref": ref], nil, options)
+        return result
+    }
+
+    /**
+     * ### Check Status of Asynchronous Deploy
+     * Get the status of an asynchronous deploy operation.
+     *
+     * GET /projects/{project_id}/deploy_status/{deployment_id} -> DeployStatusResponse
+     */
+    public func async_deploy_status(
+        /**
+         * @param {String} project_id Id of project
+         */
+        _ project_id: String,
+        /**
+         * @param {Int64} deployment_id Id of deployment
+         */
+        _ deployment_id: Int64,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let path_deployment_id = encodeParam(deployment_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/projects/\(path_project_id)/deploy_status/\(path_deployment_id)", nil, nil, options)
+        return result
+    }
+
+    /**
      * ### Deploy LookML from this Development Mode Project to Production
      *
      * Git must have been configured, must be in dev mode and deploy permission required
@@ -7658,6 +8639,10 @@ open class LookerSDKStream: APIMethods {
      * When you modify a project's `git_remote_url`, Looker connects to the remote repository to fetch
      * metadata. The remote git repository MUST be configured with the Looker-generated deploy
      * key for this project prior to setting the project's `git_remote_url`.
+     *
+     * Note that Looker will validate the git connection when the `git_remote_url` is modified.
+     * If Looker cannot connect to the remote repository (e.g. because the deploy key has not
+     * been added), the update will fail with a 400 Bad Request error.
      *
      * To set up a Looker project with a git repository residing on the Looker server (a 'bare' git repo):
      *
@@ -7892,9 +8877,6 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Get All Git Connection Tests
      *
-     * dev mode required.
-     *   - Call `update_session` to select the 'dev' workspace.
-     *
      * Returns a list of tests which can be run against a project's (or the dependency project for the provided remote_url) git connection. Call [Run Git Connection Test](#!/Project/run_git_connection_test) to execute each test in sequence.
      *
      * Tests are ordered by increasing specificity. Tests should be run in the order returned because later tests require functionality tested by tests earlier in the test list.
@@ -8046,6 +9028,75 @@ open class LookerSDKStream: APIMethods {
         let path_project_id = encodeParam(project_id)
         let result: SDKResponse<Data, SDKError> = self.post("/projects/\(path_project_id)/tag", 
             ["commit_sha": commit_sha, "tag_name": tag_name, "tag_message": tag_message], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Initiate Git Diagnosis Suite
+     *
+     * POST /projects/{project_id}/git_diagnostic_report -> GitDiagnosticReport
+     */
+    public func create_git_diagnostic_report(
+        /**
+         * @param {String} project_id Looker Project ID
+         */
+        _ project_id: String,
+        /**
+         * @param {WriteGitDiagnosticReport} body
+         */
+        _ body: WriteGitDiagnosticReport,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let result: SDKResponse<Data, SDKError> = self.post("/projects/\(path_project_id)/git_diagnostic_report", nil, try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Retrieve Live Git Diagnostic Suite Execution Status
+     *
+     * GET /projects/{project_id}/git_diagnostic_report/{report_id} -> GitDiagnosticReport
+     */
+    public func get_git_diagnostic_report(
+        /**
+         * @param {String} project_id Looker Project ID
+         */
+        _ project_id: String,
+        /**
+         * @param {String} report_id Report ID
+         */
+        _ report_id: String,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let path_report_id = encodeParam(report_id)
+        let result: SDKResponse<Data, SDKError> = self.get("/projects/\(path_project_id)/git_diagnostic_report/\(path_report_id)", nil, nil, options)
+        return result
+    }
+
+    /**
+     * ### Repair Git Configuration Issues
+     *
+     * POST /projects/{project_id}/git_diagnostic_report/{report_id}/repair -> GitDiagnosticReport
+     */
+    public func repair_git_diagnostic_report(
+        /**
+         * @param {String} project_id Looker Project ID
+         */
+        _ project_id: String,
+        /**
+         * @param {String} report_id Report ID
+         */
+        _ report_id: String,
+        /**
+         * @param {WriteGitDiagnosticReport} body
+         */
+        _ body: WriteGitDiagnosticReport,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_project_id = encodeParam(project_id)
+        let path_report_id = encodeParam(report_id)
+        let result: SDKResponse<Data, SDKError> = self.post("/projects/\(path_project_id)/git_diagnostic_report/\(path_report_id)/repair", nil, try! self.encode(body), options)
         return result
     }
 
@@ -8475,20 +9526,12 @@ open class LookerSDKStream: APIMethods {
          * @param {Bool} server_table_calcs Perform table calculations on query results
          */
         server_table_calcs: Bool? = nil,
-        /**
-         * @param {String} source Specifies the source of this call.
-         */
-        source: String? = nil,
-        /**
-         * @param {Bool} enable_oauth_error_response Return a specialized OAuth error response if a database OAuth error occurs.
-         */
-        enable_oauth_error_response: Bool? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let path_query_id = encodeParam(query_id)
         let path_result_format = encodeParam(result_format)
         let result: SDKResponse<Data, SDKError> = self.get("/queries/\(path_query_id)/run/\(path_result_format)", 
-            ["limit": limit, "apply_formatting": apply_formatting as Any?, "apply_vis": apply_vis as Any?, "cache": cache as Any?, "image_width": image_width, "image_height": image_height, "generate_drill_links": generate_drill_links as Any?, "force_production": force_production as Any?, "cache_only": cache_only as Any?, "path_prefix": path_prefix, "rebuild_pdts": rebuild_pdts as Any?, "server_table_calcs": server_table_calcs as Any?, "source": source, "enable_oauth_error_response": enable_oauth_error_response as Any?], nil, options)
+            ["limit": limit, "apply_formatting": apply_formatting as Any?, "apply_vis": apply_vis as Any?, "cache": cache as Any?, "image_width": image_width, "image_height": image_height, "generate_drill_links": generate_drill_links as Any?, "force_production": force_production as Any?, "cache_only": cache_only as Any?, "path_prefix": path_prefix, "rebuild_pdts": rebuild_pdts as Any?, "server_table_calcs": server_table_calcs as Any?], nil, options)
         return result
     }
 
@@ -8606,15 +9649,11 @@ open class LookerSDKStream: APIMethods {
          * @param {Bool} server_table_calcs Perform table calculations on query results
          */
         server_table_calcs: Bool? = nil,
-        /**
-         * @param {Bool} enable_oauth_error_response Return a specialized OAuth error response if a database OAuth error occurs.
-         */
-        enable_oauth_error_response: Bool? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let path_result_format = encodeParam(result_format)
         let result: SDKResponse<Data, SDKError> = self.post("/queries/run/\(path_result_format)", 
-            ["limit": limit, "apply_formatting": apply_formatting as Any?, "apply_vis": apply_vis as Any?, "cache": cache as Any?, "image_width": image_width, "image_height": image_height, "generate_drill_links": generate_drill_links as Any?, "force_production": force_production as Any?, "cache_only": cache_only as Any?, "path_prefix": path_prefix, "rebuild_pdts": rebuild_pdts as Any?, "server_table_calcs": server_table_calcs as Any?, "enable_oauth_error_response": enable_oauth_error_response as Any?], try! self.encode(body), options)
+            ["limit": limit, "apply_formatting": apply_formatting as Any?, "apply_vis": apply_vis as Any?, "cache": cache as Any?, "image_width": image_width, "image_height": image_height, "generate_drill_links": generate_drill_links as Any?, "force_production": force_production as Any?, "cache_only": cache_only as Any?, "path_prefix": path_prefix, "rebuild_pdts": rebuild_pdts as Any?, "server_table_calcs": server_table_calcs as Any?], try! self.encode(body), options)
         return result
     }
 
@@ -9236,10 +10275,14 @@ open class LookerSDKStream: APIMethods {
          * @param {Bool} filter_or Combine given search criteria in a boolean OR expression.
          */
         filter_or: Bool? = nil,
+        /**
+         * @param {String} models Matches model sets that contain all of the specified models (comma separated). This is an experimental feature and may not yet be available on your instance.
+         */
+        models: String? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/model_sets/search", 
-            ["fields": fields, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "name": name, "all_access": all_access as Any?, "built_in": built_in as Any?, "filter_or": filter_or as Any?], nil, options)
+            ["fields": fields, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "name": name, "all_access": all_access as Any?, "built_in": built_in as Any?, "filter_or": filter_or as Any?, "models": models], nil, options)
         return result
     }
 
@@ -9411,10 +10454,14 @@ open class LookerSDKStream: APIMethods {
          * @param {Bool} filter_or Combine given search criteria in a boolean OR expression.
          */
         filter_or: Bool? = nil,
+        /**
+         * @param {String} permissions Matches permission sets that contain all of the specified permissions (comma separated). This is an experimental feature and may not yet be available on your instance.
+         */
+        permissions: String? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/permission_sets/search", 
-            ["fields": fields, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "name": name, "all_access": all_access as Any?, "built_in": built_in as Any?, "filter_or": filter_or as Any?], nil, options)
+            ["fields": fields, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "name": name, "all_access": all_access as Any?, "built_in": built_in as Any?, "filter_or": filter_or as Any?, "permissions": permissions], nil, options)
         return result
     }
 
@@ -9527,10 +10574,14 @@ open class LookerSDKStream: APIMethods {
          * @param {DelimArray<String>} ids Optional list of ids to get specific roles.
          */
         ids: DelimArray<String>? = nil,
+        /**
+         * @param {Bool} get_all_support_roles Get all Looker support roles.
+         */
+        get_all_support_roles: Bool? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/roles", 
-            ["fields": fields, "ids": ids as Any?], nil, options)
+            ["fields": fields, "ids": ids as Any?, "get_all_support_roles": get_all_support_roles as Any?], nil, options)
         return result
     }
 
@@ -9600,6 +10651,14 @@ open class LookerSDKStream: APIMethods {
          */
         id: String? = nil,
         /**
+         * @param {String} model_set_ids Match roles with these model set ids (comma separated). This is an experimental feature and may not yet be available on your instance.
+         */
+        model_set_ids: String? = nil,
+        /**
+         * @param {String} permission_set_ids Match roles with these permission set ids (comma separated). This is an experimental feature and may not yet be available on your instance.
+         */
+        permission_set_ids: String? = nil,
+        /**
          * @param {String} name Match role name.
          */
         name: String? = nil,
@@ -9611,14 +10670,10 @@ open class LookerSDKStream: APIMethods {
          * @param {Bool} filter_or Combine given search criteria in a boolean OR expression.
          */
         filter_or: Bool? = nil,
-        /**
-         * @param {Bool} is_support_role Search for Looker support roles.
-         */
-        is_support_role: Bool? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/roles/search", 
-            ["fields": fields, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "name": name, "built_in": built_in as Any?, "filter_or": filter_or as Any?, "is_support_role": is_support_role as Any?], nil, options)
+            ["fields": fields, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "model_set_ids": model_set_ids, "permission_set_ids": permission_set_ids, "name": name, "built_in": built_in as Any?, "filter_or": filter_or as Any?], nil, options)
         return result
     }
 
@@ -9771,7 +10826,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Set all groups for a role, removing all existing group associations from that role.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PUT /roles/{role_id}/groups -> [LkGroup]
      */
@@ -9909,7 +10964,7 @@ open class LookerSDKStream: APIMethods {
      * #### Email Permissions:
      *
      * For details about permissions required to schedule delivery to email and the safeguards
-     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
      *
      *
      * #### Scheduled Plan Destination Formats
@@ -10035,7 +11090,7 @@ open class LookerSDKStream: APIMethods {
      *
      * When `run_as_recipient` is `true` and all the email recipients are Looker user accounts, the
      * queries are run in the context of each recipient, so different recipients may see different
-     * data from the same scheduled render of a look or dashboard. For more details, see [Run As Recipient](https://cloud.google.com/looker/docs/r/admin/run-as-recipient).
+     * data from the same scheduled render of a look or dashboard. For more details, see [Run As Recipient](https://docs.cloud.google.com/looker/docs/r/admin/run-as-recipient).
      *
      * Admins can create and modify scheduled plans on behalf of other users by specifying a user id.
      * Non-admin users may not create or modify scheduled plans by or for other users.
@@ -10043,7 +11098,7 @@ open class LookerSDKStream: APIMethods {
      * #### Email Permissions:
      *
      * For details about permissions required to schedule delivery to email and the safeguards
-     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
      *
      *
      * #### Scheduled Plan Destination Formats
@@ -10095,7 +11150,7 @@ open class LookerSDKStream: APIMethods {
      * #### Email Permissions:
      *
      * For details about permissions required to schedule delivery to email and the safeguards
-     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
      *
      *
      * #### Scheduled Plan Destination Formats
@@ -10360,7 +11415,7 @@ open class LookerSDKStream: APIMethods {
      * #### Email Permissions:
      *
      * For details about permissions required to schedule delivery to email and the safeguards
-     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+     * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
      *
      *
      * #### Scheduled Plan Destination Formats
@@ -10404,6 +11459,68 @@ open class LookerSDKStream: APIMethods {
     ) -> SDKResponse<Data, SDKError> {
         let path_scheduled_plan_id = encodeParam(scheduled_plan_id)
         let result: SDKResponse<Data, SDKError> = self.post("/scheduled_plans/\(path_scheduled_plan_id)/run_once", nil, try! self.encode(body), options)
+        return result
+    }
+
+
+
+    // MARK SelfService: Self Service Models
+
+    /**
+     * ### Get Allowed Connections under advanced connection governance
+     *
+     * This endpoint returns the list of allowed connection names for self-service models
+     * when advanced connection governance is enabled.
+     *
+     * GET /self_service_models/allowed_connections -> [String]
+     */
+    public func get_self_service_model_allowed_connections(
+        /**
+         * @param {Bool} google_sheets Include connections allowed for Google Sheets.
+         */
+        google_sheets: Bool? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.get("/self_service_models/allowed_connections", 
+            ["google_sheets": google_sheets as Any?], nil, options)
+        return result
+    }
+
+    /**
+     * ### Get Generated LookML for a Self Service Model
+     *
+     * GET /self_service_models/{model_name}/lookml -> String
+     */
+    public func get_self_service_model_lookml(
+        /**
+         * @param {String} model_name Name of self service model
+         */
+        _ model_name: String,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_model_name = encodeParam(model_name)
+        let result: SDKResponse<Data, SDKError> = self.get("/self_service_models/\(path_model_name)/lookml", nil, nil, options)
+        return result
+    }
+
+    /**
+     * ### Update certification for a Self Service Explore
+     *
+     * PATCH /self_service_models/{model_name}/certification -> Certification
+     */
+    public func update_self_service_explore_certification(
+        /**
+         * @param {String} model_name Name of self service model.
+         */
+        _ model_name: String,
+        /**
+         * @param {WriteCertification} body
+         */
+        _ body: WriteCertification,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_model_name = encodeParam(model_name)
+        let result: SDKResponse<Data, SDKError> = self.patch("/self_service_models/\(path_model_name)/certification", nil, try! self.encode(body), options)
         return result
     }
 
@@ -10576,7 +11693,7 @@ open class LookerSDKStream: APIMethods {
      *
      * **Permanently delete** an existing theme with [Delete Theme](#!/Theme/delete_theme)
      *
-     * For more information, see [Creating and Applying Themes](https://cloud.google.com/looker/docs/r/admin/themes).
+     * For more information, see [Creating and Applying Themes](https://docs.cloud.google.com/looker/docs/r/admin/themes).
      *
      * **Note**: Custom themes needs to be enabled by Looker. Unless custom themes are enabled, only the automatically generated default theme can be used. Please contact your Account Manager or https://console.cloud.google.com/support/cases/ to update your license for this feature.
      *
@@ -10672,15 +11789,21 @@ open class LookerSDKStream: APIMethods {
          * @param {Bool} filter_or Combine given search criteria in a boolean OR expression
          */
         filter_or: Bool? = nil,
+        /**
+         * @param {String} theme_type Match theme type ('internal', 'embed', or 'all').
+         */
+        theme_type: String? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/themes/search", 
-            ["id": id, "name": name, "begin_at": begin_at as Any?, "end_at": end_at as Any?, "limit": limit, "offset": offset, "sorts": sorts, "fields": fields, "filter_or": filter_or as Any?], nil, options)
+            ["id": id, "name": name, "begin_at": begin_at as Any?, "end_at": end_at as Any?, "limit": limit, "offset": offset, "sorts": sorts, "fields": fields, "filter_or": filter_or as Any?, "theme_type": theme_type], nil, options)
         return result
     }
 
     /**
      * ### Get the default theme
+     *
+     * This endpoint is deprecated. [Get Default Theme (with type)](#!/Theme/default_theme_by_type) should be used instead.
      *
      * Returns the active theme object set as the default.
      *
@@ -10690,6 +11813,7 @@ open class LookerSDKStream: APIMethods {
      *
      * GET /themes/default -> Theme
      */
+    @available(*, deprecated)
     public func default_theme(
         /**
          * @param {Date} ts Timestamp representing the target datetime for the active period. Defaults to 'now'
@@ -10705,6 +11829,8 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Set the global default theme by theme name
      *
+     * This endpoint is deprecated. [Set Default Theme (with type)](#!/Theme/set_default_theme_by_type) should be used instead.
+     *
      * Only Admin users can call this function.
      *
      * Only an active theme with no expiration (`end_at` not set) can be assigned as the default theme. As long as a theme has an active record with no expiration, it can be set as the default.
@@ -10717,6 +11843,7 @@ open class LookerSDKStream: APIMethods {
      *
      * PUT /themes/default -> Theme
      */
+    @available(*, deprecated)
     public func set_default_theme(
         /**
          * @param {String} name Name of theme to set as default
@@ -10726,6 +11853,66 @@ open class LookerSDKStream: APIMethods {
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.put("/themes/default", 
             ["name": name], nil, options)
+        return result
+    }
+
+    /**
+     * ### Get the default theme
+     *
+     * Returns the active theme object set as the default.
+     *
+     * The **default** theme name can be set in the UI on the Admin|Theme UI page
+     *
+     * The optional `ts` parameter can specify a different timestamp than "now." If specified, it returns the default theme at the time indicated.
+     *
+     * The optional `theme_type` parameter can specify the theme type to select for.
+     *
+     * GET /themes/default_theme -> Theme
+     */
+    public func default_theme_by_type(
+        /**
+         * @param {String} theme_type Theme type.
+         */
+        _ theme_type: String,
+        /**
+         * @param {Date} ts Timestamp representing the target datetime for the active period. Defaults to 'now'
+         */
+        ts: Date? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.get("/themes/default_theme", 
+            ["ts": ts as Any?, "theme_type": theme_type], nil, options)
+        return result
+    }
+
+    /**
+     * ### Set the global default theme by theme name
+     *
+     * Only Admin users can call this function.
+     *
+     * Only an active theme with no expiration (`end_at` not set) can be assigned as the default theme. As long as a theme has an active record with no expiration, it can be set as the default.
+     *
+     * [Create Theme](#!/Theme/create) has detailed information on rules for default and active themes
+     *
+     * Returns the new specified default theme object.
+     *
+     * The optional `theme_type` parameter can specify the theme type to select for.
+     *
+     * PUT /themes/default_theme -> Theme
+     */
+    public func set_default_theme_by_type(
+        /**
+         * @param {String} name Name of theme to set as default
+         */
+        _ name: String,
+        /**
+         * @param {String} theme_type Theme type.
+         */
+        _ theme_type: String,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.put("/themes/default_theme", 
+            ["name": name, "theme_type": theme_type], nil, options)
         return result
     }
 
@@ -10752,13 +11939,17 @@ open class LookerSDKStream: APIMethods {
          */
         ts: Date? = nil,
         /**
+         * @param {String} theme_type Theme type.
+         */
+        theme_type: String? = nil,
+        /**
          * @param {String} fields Requested fields.
          */
         fields: String? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/themes/active", 
-            ["name": name, "ts": ts as Any?, "fields": fields], nil, options)
+            ["name": name, "ts": ts as Any?, "theme_type": theme_type, "fields": fields], nil, options)
         return result
     }
 
@@ -10915,7 +12106,7 @@ open class LookerSDKStream: APIMethods {
      * Boolean search params accept only "true" and "false" as values.
      *
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /credentials_email/search -> [CredentialsEmailSearch]
      */
@@ -11110,7 +12301,11 @@ open class LookerSDKStream: APIMethods {
          */
         last_name: String? = nil,
         /**
-         * @param {Bool} verified_looker_employee Search for user accounts associated with Looker employees
+         * @param {String} full_name Match Full name (First Last).
+         */
+        full_name: String? = nil,
+        /**
+         * @param {Bool} verified_looker_employee Search for user accounts associated with Looker employees. Availability of this filter is limited to users with permission to view complete user details.
          */
         verified_looker_employee: Bool? = nil,
         /**
@@ -11118,11 +12313,11 @@ open class LookerSDKStream: APIMethods {
          */
         embed_user: Bool? = nil,
         /**
-         * @param {String} email Search for the user with this email address
+         * @param {String} email Search for the user with this email address. Availability of this filter is limited to users with permission to view complete user details.
          */
         email: String? = nil,
         /**
-         * @param {Bool} is_disabled Search for disabled user accounts
+         * @param {Bool} is_disabled Search for disabled user accounts. Availability of this filter is limited to users with permission to view complete user details.
          */
         is_disabled: Bool? = nil,
         /**
@@ -11137,10 +12332,18 @@ open class LookerSDKStream: APIMethods {
          * @param {String} group_id Search for users who are direct members of this group
          */
         group_id: String? = nil,
+        /**
+         * @param {Bool} can_manage_api3_creds Search for users who can manage API3 credentials. Availability of this filter is limited to users with permission to view complete user details. This is an experimental feature and may not yet be available on your instance.
+         */
+        can_manage_api3_creds: Bool? = nil,
+        /**
+         * @param {Bool} is_service_account Search for service account users. Send true to get only service accounts, or false to get all other types of users. Availability of this filter is limited to users with permission to view complete user details.
+         */
+        is_service_account: Bool? = nil,
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.get("/users/search", 
-            ["fields": fields, "page": page, "per_page": per_page, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "first_name": first_name, "last_name": last_name, "verified_looker_employee": verified_looker_employee as Any?, "embed_user": embed_user as Any?, "email": email, "is_disabled": is_disabled as Any?, "filter_or": filter_or as Any?, "content_metadata_id": content_metadata_id, "group_id": group_id], nil, options)
+            ["fields": fields, "page": page, "per_page": per_page, "limit": limit, "offset": offset, "sorts": sorts, "id": id, "first_name": first_name, "last_name": last_name, "full_name": full_name, "verified_looker_employee": verified_looker_employee as Any?, "embed_user": embed_user as Any?, "email": email, "is_disabled": is_disabled as Any?, "filter_or": filter_or as Any?, "content_metadata_id": content_metadata_id, "group_id": group_id, "can_manage_api3_creds": can_manage_api3_creds as Any?, "is_service_account": is_service_account as Any?], nil, options)
         return result
     }
 
@@ -11270,7 +12473,19 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Delete the user with a specific id.
      *
-     * **DANGER** this will delete the user and all looks and other information owned by the user.
+     * **This action cannot be undone.** If you want to keep the user's content, we recommend disabling their accounts instead of deleting them.
+     *
+     * Deletion will have the following impact:
+     * * Their reports, Looks and dashboards will be moved to Trash.
+     * * Any public URLs owned by them will no longer work.
+     * * Schedules created by the users or that use their content will be deleted.
+     * * Alerts will continue to run, but will not be visible or editable from the dashboard.
+     *
+     * The user cannot delete themselves.
+     * The last administrator user cannot be deleted.
+     *
+     * Deleting Service Accounts via this endpoint is deprecated and can be blocked in future versions.
+     * Please use the dedicated `delete_service_account` endpoint.
      *
      * DELETE /users/{user_id} -> String
      */
@@ -11316,7 +12531,7 @@ open class LookerSDKStream: APIMethods {
      *
      * **NOTE**: The 'api' credential type was only used with the legacy Looker query API and is no longer supported. The credential type for API you are currently looking at is 'api3'.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/credential/{credential_type}/{credential_id} -> User
      */
@@ -11343,9 +12558,64 @@ open class LookerSDKStream: APIMethods {
     }
 
     /**
+     * ### Update information for a specific service account. This action is restricted to Looker admins.
+     *
+     * This endpoint is exclusively for updating service accounts. To update a regular user, please use the `PATCH /api/3.x/users/:user_id` endpoint instead.
+     *
+     * PATCH /users/service_accounts/{user_id} -> ServiceAccount
+     */
+    public func update_service_account(
+        /**
+         * @param {String} user_id Id of service account
+         */
+        _ user_id: String,
+        /**
+         * @param {WriteServiceAccount} body
+         */
+        _ body: WriteServiceAccount,
+        /**
+         * @param {String} fields Requested fields.
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_user_id = encodeParam(user_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/users/service_accounts/\(path_user_id)", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Delete the service account with a specific id.
+     *
+     * **This action cannot be undone.** If you want to keep the service account's content, we recommend disabling their accounts instead of deleting them.
+     *
+     * Deletion will have the following impact:
+     * * Their reports, Looks and dashboards will be moved to Trash.
+     * * Any public URLs owned by them will no longer work.
+     * * Schedules created by the service account or that use their content will be deleted.
+     * * Alerts will continue to run, but will not be visible or editable from the dashboard.
+     *
+     * The service account cannot delete itself.
+     *
+     * DELETE /users/service_accounts/{user_id} -> String
+     */
+    public func delete_service_account(
+        /**
+         * @param {String} user_id Id of service account user
+         */
+        _ user_id: String,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_user_id = encodeParam(user_id)
+        let result: SDKResponse<Data, SDKError> = self.delete("/users/service_accounts/\(path_user_id)", nil, nil, options)
+        return result
+    }
+
+    /**
      * ### Email/password login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_email -> CredentialsEmail
      */
@@ -11369,7 +12639,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Email/password login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /users/{user_id}/credentials_email -> CredentialsEmail
      */
@@ -11397,7 +12667,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Email/password login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * PATCH /users/{user_id}/credentials_email -> CredentialsEmail
      */
@@ -11425,7 +12695,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Email/password login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * DELETE /users/{user_id}/credentials_email -> String
      */
@@ -11444,7 +12714,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Two-factor login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_totp -> CredentialsTotp
      */
@@ -11468,7 +12738,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Two-factor login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /users/{user_id}/credentials_totp -> CredentialsTotp
      */
@@ -11496,7 +12766,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Two-factor login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * DELETE /users/{user_id}/credentials_totp -> String
      */
@@ -11515,7 +12785,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### LDAP login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_ldap -> CredentialsLDAP
      */
@@ -11539,7 +12809,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### LDAP login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * DELETE /users/{user_id}/credentials_ldap -> String
      */
@@ -11557,8 +12827,6 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### Google authentication login information for the specified user.
-     *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_google -> CredentialsGoogle
      */
@@ -11582,8 +12850,6 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Google authentication login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-     *
      * DELETE /users/{user_id}/credentials_google -> String
      */
     public func delete_user_credentials_google(
@@ -11600,8 +12866,6 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### Saml authentication login information for the specified user.
-     *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_saml -> CredentialsSaml
      */
@@ -11625,8 +12889,6 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Saml authentication login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-     *
      * DELETE /users/{user_id}/credentials_saml -> String
      */
     public func delete_user_credentials_saml(
@@ -11643,8 +12905,6 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### OpenID Connect (OIDC) authentication login information for the specified user.
-     *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_oidc -> CredentialsOIDC
      */
@@ -11668,8 +12928,6 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### OpenID Connect (OIDC) authentication login information for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-     *
      * DELETE /users/{user_id}/credentials_oidc -> String
      */
     public func delete_user_credentials_oidc(
@@ -11686,8 +12944,6 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
-     *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_api3/{credentials_api3_id} -> CredentialsApi3
      */
@@ -11716,7 +12972,36 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * PATCH /users/{user_id}/credentials_api3/{credentials_api3_id} -> CredentialsApi3
+     */
+    public func update_user_credentials_api3(
+        /**
+         * @param {String} user_id Id of user
+         */
+        _ user_id: String,
+        /**
+         * @param {String} credentials_api3_id Id of API Credential
+         */
+        _ credentials_api3_id: String,
+        /**
+         * @param {WriteCredentialsApi3} body
+         */
+        _ body: WriteCredentialsApi3,
+        /**
+         * @param {String} fields Requested fields.
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let path_user_id = encodeParam(user_id)
+        let path_credentials_api3_id = encodeParam(credentials_api3_id)
+        let result: SDKResponse<Data, SDKError> = self.patch("/users/\(path_user_id)/credentials_api3/\(path_credentials_api3_id)", 
+            ["fields": fields], try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
      *
      * DELETE /users/{user_id}/credentials_api3/{credentials_api3_id} -> String
      */
@@ -11740,8 +13025,6 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-     *
      * GET /users/{user_id}/credentials_api3 -> [CredentialsApi3]
      */
     public func all_user_credentials_api3s(
@@ -11763,8 +13046,6 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
-     *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /users/{user_id}/credentials_api3 -> CreateCredentialsApi3
      */
@@ -11788,7 +13069,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Embed login information for the specified user.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * GET /users/{user_id}/credentials_embed/{credentials_embed_id} -> CredentialsEmbed
      */
@@ -11817,7 +13098,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Embed login information for the specified user.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * DELETE /users/{user_id}/credentials_embed/{credentials_embed_id} -> String
      */
@@ -11841,7 +13122,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Embed login information for the specified user.
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * GET /users/{user_id}/credentials_embed -> [CredentialsEmbed]
      */
@@ -11865,7 +13146,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Looker Openid login information for the specified user. Used by Looker Analysts.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/credentials_looker_openid -> CredentialsLookerOpenid
      */
@@ -11889,7 +13170,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Looker Openid login information for the specified user. Used by Looker Analysts.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * DELETE /users/{user_id}/credentials_looker_openid -> String
      */
@@ -11907,8 +13188,6 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### Web login session for the specified user.
-     *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/sessions/{session_id} -> Session
      */
@@ -11937,8 +13216,6 @@ open class LookerSDKStream: APIMethods {
     /**
      * ### Web login session for the specified user.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-     *
      * DELETE /users/{user_id}/sessions/{session_id} -> String
      */
     public func delete_user_session(
@@ -11960,8 +13237,6 @@ open class LookerSDKStream: APIMethods {
 
     /**
      * ### Web login session for the specified user.
-     *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * GET /users/{user_id}/sessions -> [Session]
      */
@@ -11993,7 +13268,7 @@ open class LookerSDKStream: APIMethods {
      * The expire period is always 60 minutes when expires is enabled.
      * This method can be called with an empty body.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /users/{user_id}/credentials_email/password_reset -> CredentialsEmail
      */
@@ -12183,7 +13458,7 @@ open class LookerSDKStream: APIMethods {
      * Password reset URLs will expire in 60 minutes.
      * This method can be called with an empty body.
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /users/{user_id}/credentials_email/send_password_reset -> CredentialsEmail
      */
@@ -12213,7 +13488,7 @@ open class LookerSDKStream: APIMethods {
      * The user's 'is_disabled' status must be true.
      * If the user has a credential email, they will receive a verification email and the user will be disabled until they verify the email
      *
-     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+     * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
      *
      * POST /users/{user_id}/update_emails -> User
      */
@@ -12241,7 +13516,7 @@ open class LookerSDKStream: APIMethods {
     /**
      * Create an embed user from an external user ID
      *
-     * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+     * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
      *
      * POST /users/embed_user -> UserPublic
      */
@@ -12253,6 +13528,27 @@ open class LookerSDKStream: APIMethods {
         options: ITransportSettings? = nil
     ) -> SDKResponse<Data, SDKError> {
         let result: SDKResponse<Data, SDKError> = self.post("/users/embed_user", nil, try! self.encode(body), options)
+        return result
+    }
+
+    /**
+     * ### Create a service account with the specified information. This action is restricted to Looker admins.
+     *
+     * POST /users/service_accounts -> ServiceAccount
+     */
+    public func create_service_account(
+        /**
+         * @param {WriteServiceAccount} body
+         */
+        _ body: WriteServiceAccount,
+        /**
+         * @param {String} fields Requested fields.
+         */
+        fields: String? = nil,
+        options: ITransportSettings? = nil
+    ) -> SDKResponse<Data, SDKError> {
+        let result: SDKResponse<Data, SDKError> = self.post("/users/service_accounts", 
+            ["fields": fields], try! self.encode(body), options)
         return result
     }
 

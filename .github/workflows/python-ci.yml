@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
       - run: pip install -e .
       - run: pip install mypy types-requests
       - run: mypy looker_sdk/
@@ -71,15 +71,15 @@ jobs:
             # - macos # Temporary disable since runners down
           - windows
         python-version:
-          - '3.13'
+          - '3.14'
         include:
-          - python-version: '3.9'
-            os: ubuntu
           - python-version: '3.10'
             os: ubuntu
           - python-version: '3.11'
             os: ubuntu
           - python-version: '3.12'
+            os: ubuntu
+          - python-version: '3.13'
             os: ubuntu
 
     steps:
@@ -153,10 +153,10 @@ jobs:
       - name: Repo Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.13
+      - name: Set up Python 3.14
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -200,10 +200,12 @@ jobs:
         # TODO: can we cache some layers of the image for faster download?
         # we probably don't want to cache the final image for IP security...
         run: |
-          docker pull --quiet us-west1-docker.pkg.dev/cloud-looker-sdk-codegen-cicd/looker/${{ matrix.looker }}
+          docker pull --quiet us-west1-docker.pkg.dev/cloud-looker-sdk-codegen-cicd/looker/${MATRIX_LOOKER}
           # set $LOOKER_OPTS to --no-ssl if we want to turn off ssl
-          docker run --name looker-sdk-codegen-ci -d -p 10000:9999 -p 20000:19999 us-west1-docker.pkg.dev/cloud-looker-sdk-codegen-cicd/looker/${{ matrix.looker }}
+          docker run --name looker-sdk-codegen-ci -d -p 10000:9999 -p 20000:19999 us-west1-docker.pkg.dev/cloud-looker-sdk-codegen-cicd/looker/${MATRIX_LOOKER}
           docker logs -f looker-sdk-codegen-ci --until=30s &
+        env:
+          MATRIX_LOOKER: ${{ matrix.looker }}
 
       - name: Install Tox and any other packages
         run: |
@@ -236,10 +238,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.14'
       - name: Twine upload check
         run: |
-          pip install wheel twine
+          pip install wheel twine setuptools
           python setup.py sdist bdist_wheel
           twine check dist/*
 

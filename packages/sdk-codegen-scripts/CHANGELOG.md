@@ -214,6 +214,141 @@
     * @looker/sdk-codegen-utils bumped from 21.0.19 to 21.0.20
     * @looker/sdk-node bumped from 25.0.1 to 25.2.0
 
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.4.0 to 25.6.0
+    * @looker/sdk-codegen bumped from 21.9.10 to 21.9.11
+    * @looker/sdk-codegen-utils bumped from 21.0.21 to 21.0.22
+    * @looker/sdk-node bumped from 25.4.0 to 25.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.6.0 to 25.8.0
+    * @looker/sdk-codegen bumped from 21.9.11 to 21.9.12
+    * @looker/sdk-codegen-utils bumped from 21.0.22 to 21.0.23
+    * @looker/sdk-node bumped from 25.6.0 to 25.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.8.0 to 25.10.0
+    * @looker/sdk-codegen bumped from 21.9.12 to 21.9.13
+    * @looker/sdk-codegen-utils bumped from 21.0.23 to 21.0.24
+    * @looker/sdk-node bumped from 25.8.0 to 25.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.10.0 to 25.16.0
+    * @looker/sdk-codegen bumped from 21.9.13 to 21.10.0
+    * @looker/sdk-codegen-utils bumped from 21.0.24 to 21.0.25
+    * @looker/sdk-node bumped from 25.10.0 to 25.16.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.16.0 to 25.18.0
+    * @looker/sdk-codegen bumped from 21.10.0 to 21.10.1
+    * @looker/sdk-codegen-utils bumped from 21.0.25 to 21.0.26
+    * @looker/sdk-node bumped from 25.16.0 to 25.18.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.18.0 to 25.20.0
+    * @looker/sdk-codegen bumped from 21.10.1 to 21.10.2
+    * @looker/sdk-codegen-utils bumped from 21.0.26 to 21.0.27
+    * @looker/sdk-node bumped from 25.18.0 to 25.20.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.20.0 to 26.0.0
+    * @looker/sdk-codegen bumped from 21.10.2 to 21.10.3
+    * @looker/sdk-codegen-utils bumped from 21.0.27 to 21.0.28
+    * @looker/sdk-node bumped from 25.20.0 to 26.0.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.0.0 to 26.2.0
+    * @looker/sdk-codegen bumped from 21.10.3 to 21.10.4
+    * @looker/sdk-codegen-utils bumped from 21.0.28 to 21.0.29
+    * @looker/sdk-node bumped from 26.0.0 to 26.2.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.4.0 to 26.6.0
+    * @looker/sdk-codegen bumped from 21.11.0 to 21.11.1
+    * @looker/sdk-codegen-utils bumped from 21.0.30 to 21.0.31
+    * @looker/sdk-node bumped from 26.4.0 to 26.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.6.0 to 26.6.1
+    * @looker/sdk-codegen bumped from 21.11.1 to 21.11.2
+    * @looker/sdk-codegen-utils bumped from 21.0.31 to 21.0.32
+    * @looker/sdk-node bumped from 26.6.0 to 26.6.1
+    * @looker/sdk-rtl bumped from 21.6.4 to 21.6.5
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.6.1 to 26.8.0
+    * @looker/sdk-codegen bumped from 21.11.2 to 21.11.3
+    * @looker/sdk-codegen-utils bumped from 21.0.32 to 21.0.33
+    * @looker/sdk-node bumped from 26.6.1 to 26.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.8.0 to 26.10.0
+    * @looker/sdk-codegen bumped from 21.11.3 to 21.11.4
+    * @looker/sdk-codegen-utils bumped from 21.0.33 to 21.0.34
+    * @looker/sdk-node bumped from 26.8.0 to 26.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.10.0 to 26.12.0
+    * @looker/sdk-codegen bumped from 21.11.4 to 26.12.0
+    * @looker/sdk-codegen-utils bumped from 21.0.34 to 21.0.35
+    * @looker/sdk-node bumped from 26.10.0 to 26.12.0
+
+## [21.5.40](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-scripts-v21.5.39...sdk-codegen-scripts-v21.5.40) (2026-03-11)
+
+
+### Bug Fixes
+
+* **codegen:** allow yarn gen to work with remote looker server ([#1645](https://github.com/looker-open-source/sdk-codegen/issues/1645)) ([53621ea](https://github.com/looker-open-source/sdk-codegen/commit/53621ea1e8b84cc5be2f6e61d07a0e10d8502563)), closes [#1644](https://github.com/looker-open-source/sdk-codegen/issues/1644)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.2.0 to 26.4.0
+    * @looker/sdk-codegen bumped from 21.10.4 to 21.11.0
+    * @looker/sdk-codegen-utils bumped from 21.0.29 to 21.0.30
+    * @looker/sdk-node bumped from 26.2.0 to 26.4.0
+
 ## [21.5.31](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-scripts-v21.5.30...sdk-codegen-scripts-v21.5.31) (2025-03-11)
 
 

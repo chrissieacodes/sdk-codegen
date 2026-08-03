@@ -261,7 +261,7 @@ export class GoGen extends CodeGen {
     return (
       `` +
       resultDef +
-      `${indent}err := l.session.Do(${resultPointer}, "${this.capitalize(
+      `${indent}err := l.AuthSession.Do(${resultPointer}, "${this.capitalize(
         method.httpMethod.toUpperCase()
       )}", "${this.apiPath}", ${this.httpPath(method.endpoint, request)}` +
       `${args ? ', ' + args : ''})` +
@@ -284,18 +284,33 @@ export class GoGen extends CodeGen {
     // add options at the end of the request calls. this will cause all other arguments to be
     // filled in but there's no way to avoid this for passing in the last optional parameter.
     // Fortunately, this code bloat is minimal and also hidden from the consumer.
-    let result = this.argFill('', 'options');
-    // let result = this.argFill('', this.argGroup(indent, method.cookieArgs, request))
-    // result = this.argFill(result, this.argGroup(indent, method.headerArgs, request))
-    result = this.argFill(
-      result,
-      method.bodyArg ? this.accessor(method.bodyArg, request) : this.nullStr
-    );
-    result = this.argFill(
-      result,
-      this.argGroup(indent, method.queryArgs, request)
-    );
+    let options = 'options';
+    let body = method.bodyArg
+      ? this.accessor(method.bodyArg, request)
+      : this.nullStr;
+    let query = this.argGroup(indent, method.queryArgs, request);
+    const formArgs = this.assignFormArgs(method, body, query, options);
+    body = formArgs.body;
+    query = formArgs.query;
+    options = formArgs.options;
+
+    let result = this.argFill('', options);
+    result = this.argFill(result, body);
+    result = this.argFill(result, query);
     return result;
+  }
+
+  assignFormArgs(
+    method: IMethod,
+    body: string,
+    query: string,
+    options: string
+  ): { body: string; query: string; options: string } {
+    if (method.isFormUrlEncoded) {
+      body = query.replace('map[string]interface{}', 'rtl.Values');
+      query = this.nullStr;
+    }
+    return { body, query, options };
   }
 
   argGroup(_indent: string, args: Arg[], prefix?: string) {
@@ -361,22 +376,23 @@ package ${this.packageName}
 
 import (
     "fmt"
-    "github.com/looker-open-source/sdk-codegen/go/rtl"
     "net/url"
     "time"
+
+    "github.com/looker-open-source/sdk-codegen/go/rtl"
 )
 
-type authSessionDoer interface {
+type AuthSessionDoer interface {
   Do(result interface{}, method, ver, path string, reqPars map[string]interface{}, body interface{}, options *rtl.ApiSettings) error
 }
 
 type LookerSDK struct {
-  session authSessionDoer
+  AuthSession AuthSessionDoer
 }
 
-func NewLookerSDK(session authSessionDoer) *LookerSDK {
+func NewLookerSDK(session AuthSessionDoer) *LookerSDK {
   return &LookerSDK{
-    session: session,
+    AuthSession: session,
   }
 }
 `;
@@ -428,8 +444,8 @@ ${goImport}
       any: { default: mt, name: 'interface{}' },
       boolean: { default: mt, name: 'bool' },
       byte: { default: mt, name: 'byte' },
-      date: { default: mt, name: 'time.Time' },
-      datetime: { default: mt, name: 'time.Time' },
+      date: { default: '', name: 'time.Time' },
+      datetime: { default: '', name: 'time.Time' },
       double: { default: mt, name: 'float64' },
       float: { default: mt, name: 'float32' },
       int32: { default: mt, name: 'int32' },

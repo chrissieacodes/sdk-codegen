@@ -83,7 +83,7 @@ func (l *LookerSDK) OldLogin(
   oldCred string,
   options *rtl.ApiSettings) (AccessToken, error) {
   var result AccessToken
-  err := l.session.Do(&result, "GET", "", "/old_login", map[string]interface{}{"old_cred": oldCred}, nil, options)
+  err := l.AuthSession.Do(&result, "GET", "", "/old_login", map[string]interface{}{"old_cred": oldCred}, nil, options)
   return result, err
 
 }`;
@@ -127,6 +127,15 @@ type HyphenType struct {
       const actual = gen.declareType('', type);
       gen.noComment = false;
       expect(actual).toEqual(expected);
+    });
+  });
+
+  describe('methods', () => {
+    it('handles optional date-time parameters as pointers', () => {
+      const method = apiTestModel.methods.theme_or_default;
+      expect(method).toBeDefined();
+      const actual = gen.declareMethod(indent, method);
+      expect(actual).toContain('ts *time.Time');
     });
   });
 });

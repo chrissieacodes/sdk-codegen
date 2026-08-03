@@ -310,6 +310,198 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * @looker/sdk-codegen-scripts bumped from 21.5.29 to 21.5.30
     * @looker/sdk-node bumped from 25.0.1 to 25.2.0
 
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.41 to 0.1.42
+    * @looker/extension-utils bumped from 0.1.51 to 0.1.52
+    * @looker/run-it bumped from 0.9.74 to 0.9.75
+    * @looker/sdk bumped from 25.4.0 to 25.6.0
+    * @looker/sdk-codegen bumped from 21.9.10 to 21.9.11
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.31 to 21.5.32
+    * @looker/sdk-node bumped from 25.4.0 to 25.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.42 to 0.1.43
+    * @looker/extension-utils bumped from 0.1.52 to 0.1.53
+    * @looker/run-it bumped from 0.9.75 to 0.9.76
+    * @looker/sdk bumped from 25.6.0 to 25.8.0
+    * @looker/sdk-codegen bumped from 21.9.11 to 21.9.12
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.32 to 21.5.33
+    * @looker/sdk-node bumped from 25.6.0 to 25.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.43 to 0.1.44
+    * @looker/extension-utils bumped from 0.1.53 to 0.1.54
+    * @looker/run-it bumped from 0.9.76 to 0.9.77
+    * @looker/sdk bumped from 25.8.0 to 25.10.0
+    * @looker/sdk-codegen bumped from 21.9.12 to 21.9.13
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.33 to 21.5.34
+    * @looker/sdk-node bumped from 25.8.0 to 25.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.44 to 0.1.45
+    * @looker/extension-utils bumped from 0.1.54 to 0.1.55
+    * @looker/run-it bumped from 0.9.77 to 0.9.78
+    * @looker/sdk bumped from 25.10.0 to 25.16.0
+    * @looker/sdk-codegen bumped from 21.9.13 to 21.10.0
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.34 to 21.5.35
+    * @looker/sdk-node bumped from 25.10.0 to 25.16.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.45 to 0.1.46
+    * @looker/extension-utils bumped from 0.1.55 to 0.1.56
+    * @looker/run-it bumped from 0.9.78 to 0.9.79
+    * @looker/sdk bumped from 25.16.0 to 25.18.0
+    * @looker/sdk-codegen bumped from 21.10.0 to 21.10.1
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.35 to 21.5.36
+    * @looker/sdk-node bumped from 25.16.0 to 25.18.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.46 to 0.1.47
+    * @looker/extension-utils bumped from 0.1.56 to 0.1.57
+    * @looker/run-it bumped from 0.9.79 to 0.9.80
+    * @looker/sdk bumped from 25.18.0 to 25.20.0
+    * @looker/sdk-codegen bumped from 21.10.1 to 21.10.2
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.36 to 21.5.37
+    * @looker/sdk-node bumped from 25.18.0 to 25.20.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.47 to 0.1.48
+    * @looker/extension-utils bumped from 0.1.57 to 0.1.58
+    * @looker/run-it bumped from 0.9.80 to 0.9.81
+    * @looker/sdk bumped from 25.20.0 to 26.0.0
+    * @looker/sdk-codegen bumped from 21.10.2 to 21.10.3
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.37 to 21.5.38
+    * @looker/sdk-node bumped from 25.20.0 to 26.0.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.48 to 0.1.49
+    * @looker/extension-utils bumped from 0.1.58 to 0.1.59
+    * @looker/run-it bumped from 0.9.81 to 0.9.82
+    * @looker/sdk bumped from 26.0.0 to 26.2.0
+    * @looker/sdk-codegen bumped from 21.10.3 to 21.10.4
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.38 to 21.5.39
+    * @looker/sdk-node bumped from 26.0.0 to 26.2.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.50 to 0.1.51
+    * @looker/extension-utils bumped from 0.1.60 to 0.1.61
+    * @looker/run-it bumped from 0.9.83 to 0.9.84
+    * @looker/sdk bumped from 26.4.0 to 26.6.0
+    * @looker/sdk-codegen bumped from 21.11.0 to 21.11.1
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.40 to 21.5.41
+    * @looker/sdk-node bumped from 26.4.0 to 26.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.51 to 0.1.52
+    * @looker/extension-utils bumped from 0.1.61 to 0.1.62
+    * @looker/run-it bumped from 0.9.84 to 0.9.85
+    * @looker/sdk bumped from 26.6.0 to 26.6.1
+    * @looker/sdk-codegen bumped from 21.11.1 to 21.11.2
+    * @looker/sdk-rtl bumped from 21.6.4 to 21.6.5
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.41 to 21.5.42
+    * @looker/sdk-node bumped from 26.6.0 to 26.6.1
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.52 to 0.1.53
+    * @looker/extension-utils bumped from 0.1.62 to 0.1.63
+    * @looker/run-it bumped from 0.9.85 to 0.9.86
+    * @looker/sdk bumped from 26.6.1 to 26.8.0
+    * @looker/sdk-codegen bumped from 21.11.2 to 21.11.3
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.42 to 21.5.43
+    * @looker/sdk-node bumped from 26.6.1 to 26.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.53 to 0.1.54
+    * @looker/extension-utils bumped from 0.1.63 to 0.1.64
+    * @looker/run-it bumped from 0.9.86 to 0.9.87
+    * @looker/sdk bumped from 26.8.0 to 26.10.0
+    * @looker/sdk-codegen bumped from 21.11.3 to 21.11.4
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.43 to 21.5.44
+    * @looker/sdk-node bumped from 26.8.0 to 26.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.54 to 0.1.55
+    * @looker/extension-utils bumped from 0.1.64 to 0.1.65
+    * @looker/run-it bumped from 0.9.87 to 0.9.88
+    * @looker/sdk bumped from 26.10.0 to 26.12.0
+    * @looker/sdk-codegen bumped from 21.11.4 to 26.12.0
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.44 to 21.5.45
+    * @looker/sdk-node bumped from 26.10.0 to 26.12.0
+
+## [0.9.83](https://github.com/looker-open-source/sdk-codegen/compare/api-explorer-v0.9.82...api-explorer-v0.9.83) (2026-03-11)
+
+
+### Features
+
+* **api-explorer-test:** allow some api-explorer e2e tests to run remotely - phase 1 ([#1641](https://github.com/looker-open-source/sdk-codegen/issues/1641)) ([25a5335](https://github.com/looker-open-source/sdk-codegen/commit/25a53355a3abf2066aa06a7a3a20f35be0e61028)), closes [#1640](https://github.com/looker-open-source/sdk-codegen/issues/1640)
+* **api-explorer:** render and format form-urlencoded queries as body parameters ([#1648](https://github.com/looker-open-source/sdk-codegen/issues/1648)) ([46eb5c9](https://github.com/looker-open-source/sdk-codegen/commit/46eb5c968098417fe3cfb6cce3adf8bffd21d663))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/code-editor bumped from 0.1.49 to 0.1.50
+    * @looker/extension-utils bumped from 0.1.59 to 0.1.60
+    * @looker/run-it bumped from 0.9.82 to 0.9.83
+    * @looker/sdk bumped from 26.2.0 to 26.4.0
+    * @looker/sdk-codegen bumped from 21.10.4 to 21.11.0
+  * devDependencies
+    * @looker/sdk-codegen-scripts bumped from 21.5.39 to 21.5.40
+    * @looker/sdk-node bumped from 26.2.0 to 26.4.0
+
 ## [0.9.74](https://github.com/looker-open-source/sdk-codegen/compare/api-explorer-v0.9.73...api-explorer-v0.9.74) (2025-03-11)
 
 

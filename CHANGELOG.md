@@ -1,5 +1,168 @@
 # Changelog
 
+## [26.12.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.10.0...sdk-codegen-all-v26.12.0) (2026-07-13)
+
+
+### Features
+
+* generate SDKs for Looker 26.12 ([#1734](https://github.com/looker-open-source/sdk-codegen/issues/1734)) ([854bb4f](https://github.com/looker-open-source/sdk-codegen/commit/854bb4f16096758cae4a1616f96f46ec2fbb4140))
+* python conversational analytics timestamp ([#1733](https://github.com/looker-open-source/sdk-codegen/issues/1733)) ([ad54373](https://github.com/looker-open-source/sdk-codegen/commit/ad5437350cf2dc00ccaa350e01468f2abaead349))
+* **python:** add conversational analytics chat support and fix datetime parsing ([ac92db1](https://github.com/looker-open-source/sdk-codegen/commit/ac92db16f64dee8080002b30713e6bd2c4ed83a6))
+
+## [26.10.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.8.0...sdk-codegen-all-v26.10.0) (2026-06-08)
+
+
+### Features
+
+* generate SDKs for Looker 26.10 ([#1721](https://github.com/looker-open-source/sdk-codegen/issues/1721)) ([e3a2e80](https://github.com/looker-open-source/sdk-codegen/commit/e3a2e80698a144e1986ffbb8d8db421cdee61a38))
+
+
+### Bug Fixes
+
+* fixes for python 3.14 ([#1715](https://github.com/looker-open-source/sdk-codegen/issues/1715)) ([01e249b](https://github.com/looker-open-source/sdk-codegen/commit/01e249bdb493aa663b915ddedd9ca0aa219efc43))
+
+## [26.8.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.6.4...sdk-codegen-all-v26.8.0) (2026-05-11)
+
+
+### Features
+
+* generate SDKs for Looker 26.8 ([#1710](https://github.com/looker-open-source/sdk-codegen/issues/1710)) ([c39c529](https://github.com/looker-open-source/sdk-codegen/commit/c39c5296cc50aabd01141b5208697a77a960ac1b))
+
+## [26.6.4](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.6.3...sdk-codegen-all-v26.6.4) (2026-04-09)
+
+
+### Features
+
+* Adding shadow jar building ability to Kotlin SDK ([#1698](https://github.com/looker-open-source/sdk-codegen/issues/1698)) ([6468b1f](https://github.com/looker-open-source/sdk-codegen/commit/6468b1f6deee19d67e7df74d50d2709a045053b6))
+* Switching HTTP request library for FetchIAPToken ([#1699](https://github.com/looker-open-source/sdk-codegen/issues/1699)) ([b316568](https://github.com/looker-open-source/sdk-codegen/commit/b316568df65a315fb4c54fab404f99f8d1089804))
+
+## [26.6.3](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.6.2...sdk-codegen-all-v26.6.3) (2026-04-03)
+
+
+### Features
+
+* **Kotlin SDK:** Iap kotlin sdk support ([#1684](https://github.com/looker-open-source/sdk-codegen/issues/1684)) ([5669868](https://github.com/looker-open-source/sdk-codegen/commit/5669868a267017e3185874186eca1bdf4c69288f))
+
+## [26.6.2](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.6.1...sdk-codegen-all-v26.6.2) (2026-03-27)
+
+
+### Features
+
+* **KotlinSDK:** Adding IAP support for the Kotlin SDK ([#1662](https://github.com/looker-open-source/sdk-codegen/issues/1662)) ([#1672](https://github.com/looker-open-source/sdk-codegen/issues/1672)) ([80b34e1](https://github.com/looker-open-source/sdk-codegen/commit/80b34e1e67bcf69125444a5e9a9b55766fdd864d))
+
+## [26.6.1](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.6.0...sdk-codegen-all-v26.6.1) (2026-03-25)
+
+
+### Features
+
+* generate SDKs for Looker 26.6.1 ([#1676](https://github.com/looker-open-source/sdk-codegen/issues/1676)) ([b48b953](https://github.com/looker-open-source/sdk-codegen/commit/b48b953d920463596bb0839cd88fc000c1a4cff3))
+
+
+### Bug Fixes
+
+* **codegen:** implement type-driven form encoding across SDKs ([#1674](https://github.com/looker-open-source/sdk-codegen/issues/1674)) ([58aaf86](https://github.com/looker-open-source/sdk-codegen/commit/58aaf8603be2a10cdd641c84d8d46ff98ce6d269)), closes [#1673](https://github.com/looker-open-source/sdk-codegen/issues/1673)
+
+## [26.6.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.4.1...sdk-codegen-all-v26.6.0) (2026-03-20)
+
+
+### Features
+
+* generate SDKs for Looker 26_6 ([#1667](https://github.com/looker-open-source/sdk-codegen/issues/1667)) ([5f9b84e](https://github.com/looker-open-source/sdk-codegen/commit/5f9b84e70f5b7d5d45c41ae13a861d083317d3a0))
+
+## [26.4.1](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.4.0...sdk-codegen-all-v26.4.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* fix yarn lock ([#1659](https://github.com/looker-open-source/sdk-codegen/issues/1659)) ([13a9f61](https://github.com/looker-open-source/sdk-codegen/commit/13a9f61b2e9514d0fdbaede274b684ce8604c73c))
+
+## [26.4.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.2.0...sdk-codegen-all-v26.4.0) (2026-03-11)
+
+
+### Features
+
+* **api-explorer-test:** allow some api-explorer e2e tests to run remotely - phase 1 ([#1641](https://github.com/looker-open-source/sdk-codegen/issues/1641)) ([25a5335](https://github.com/looker-open-source/sdk-codegen/commit/25a53355a3abf2066aa06a7a3a20f35be0e61028)), closes [#1640](https://github.com/looker-open-source/sdk-codegen/issues/1640)
+* **api-explorer:** render and format form-urlencoded queries as body parameters ([#1648](https://github.com/looker-open-source/sdk-codegen/issues/1648)) ([46eb5c9](https://github.com/looker-open-source/sdk-codegen/commit/46eb5c968098417fe3cfb6cce3adf8bffd21d663))
+* generate SDKs for Looker 26.4 ([#1657](https://github.com/looker-open-source/sdk-codegen/issues/1657)) ([d3b516c](https://github.com/looker-open-source/sdk-codegen/commit/d3b516cf02848141a31f3b51b263349f9d5d42ab))
+* refactor SDK generator for form-urlencoded params ([#1647](https://github.com/looker-open-source/sdk-codegen/issues/1647)) ([2197c17](https://github.com/looker-open-source/sdk-codegen/commit/2197c17df142df2de748aaddcdc4815d16724bff)), closes [#1646](https://github.com/looker-open-source/sdk-codegen/issues/1646)
+
+
+### Bug Fixes
+
+* **codegen:** allow yarn gen to work with remote looker server ([#1645](https://github.com/looker-open-source/sdk-codegen/issues/1645)) ([53621ea](https://github.com/looker-open-source/sdk-codegen/commit/53621ea1e8b84cc5be2f6e61d07a0e10d8502563)), closes [#1644](https://github.com/looker-open-source/sdk-codegen/issues/1644)
+* **tests:** fix some unit test failures and document remaining issues ([#1643](https://github.com/looker-open-source/sdk-codegen/issues/1643)) ([299ba8b](https://github.com/looker-open-source/sdk-codegen/commit/299ba8bd4ca6c406059da39b5fa2d44852b23ee5))
+
+## [26.2.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v26.0.0...sdk-codegen-all-v26.2.0) (2026-02-13)
+
+
+### Features
+
+* generate SDKs for Looker 26.2 ([#1637](https://github.com/looker-open-source/sdk-codegen/issues/1637)) ([e038925](https://github.com/looker-open-source/sdk-codegen/commit/e0389253b934998833bed8ade5f988312ef2d77b))
+
+
+### Bug Fixes
+
+* **PythonDeleteMethod:** Did not passthrough query_params ([#1635](https://github.com/looker-open-source/sdk-codegen/issues/1635)) ([6f39a54](https://github.com/looker-open-source/sdk-codegen/commit/6f39a540dbc5493e509881155e5b8f3cf8b60bd1))
+
+## [26.0.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.20.0...sdk-codegen-all-v26.0.0) (2026-02-02)
+
+
+### Features
+
+* generate SDKs for Looker 26.0 ([#1631](https://github.com/looker-open-source/sdk-codegen/issues/1631)) ([3b36a3c](https://github.com/looker-open-source/sdk-codegen/commit/3b36a3c7f6eb488b72993891b4ed05a99194f61e))
+* **go-sdk:** Automatically refresh expired authentication tokens ([#1608](https://github.com/looker-open-source/sdk-codegen/issues/1608)) ([935dae6](https://github.com/looker-open-source/sdk-codegen/commit/935dae6edeb47bdcad167f3b87167d1701182a24))
+
+## [25.20.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.18.0...sdk-codegen-all-v25.20.0) (2025-11-05)
+
+
+### Features
+
+* generate SDKs for Looker 25.20 ([#1612](https://github.com/looker-open-source/sdk-codegen/issues/1612)) ([89c707d](https://github.com/looker-open-source/sdk-codegen/commit/89c707da1c5aeac8df305f5460618f31f524f722))
+
+## [25.18.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.16.0...sdk-codegen-all-v25.18.0) (2025-10-28)
+
+
+### Features
+
+* generate SDKs for Looker 25.18 ([#1609](https://github.com/looker-open-source/sdk-codegen/issues/1609)) ([f3ce99d](https://github.com/looker-open-source/sdk-codegen/commit/f3ce99d77a0ab47f25d614f9422197b80d04b803))
+
+## [25.16.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.10.0...sdk-codegen-all-v25.16.0) (2025-09-17)
+
+
+### Features
+
+* generate SDKs for Looker 25.14 ([#1600](https://github.com/looker-open-source/sdk-codegen/issues/1600)) ([feff16e](https://github.com/looker-open-source/sdk-codegen/commit/feff16eca79224737f991fc903790473f163c28c))
+* generate SDKs for Looker 25.16 ([#1605](https://github.com/looker-open-source/sdk-codegen/issues/1605)) ([5792b41](https://github.com/looker-open-source/sdk-codegen/commit/5792b41311b75e1841561e53e13362f8f473bf3c))
+* **go:** Expose session object in Go SDK ([#1602](https://github.com/looker-open-source/sdk-codegen/issues/1602)) ([6afa715](https://github.com/looker-open-source/sdk-codegen/commit/6afa7158d6786994b7f2592e634c95f2723c7f8a))
+
+
+### Bug Fixes
+
+* fixed bug in go example ([#1595](https://github.com/looker-open-source/sdk-codegen/issues/1595)) ([6e45409](https://github.com/looker-open-source/sdk-codegen/commit/6e454098089a27053f4b26d376fdff8716de6929))
+
+## [25.10.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.8.0...sdk-codegen-all-v25.10.0) (2025-06-20)
+
+
+### Features
+
+* generate SDKs for Looker 25.10 ([#1592](https://github.com/looker-open-source/sdk-codegen/issues/1592)) ([9beffa3](https://github.com/looker-open-source/sdk-codegen/commit/9beffa3e9e4639777ce0d4b43909405efae9d467))
+
+## [25.8.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.6.0...sdk-codegen-all-v25.8.0) (2025-05-19)
+
+
+### Features
+
+* Note that the method signature for `sync_lookml_dashboard` has changed.
+
+* generate SDKs for Looker 25.8 ([#1584](https://github.com/looker-open-source/sdk-codegen/issues/1584)) ([1283c4c](https://github.com/looker-open-source/sdk-codegen/commit/1283c4cfb90b5e294b10b801356a246d8b1d2364))
+
+## [25.6.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.4.0...sdk-codegen-all-v25.6.0) (2025-05-05)
+
+
+### Features
+
+* generate SDKs for Looker 25.6 ([#1574](https://github.com/looker-open-source/sdk-codegen/issues/1574)) ([417db6a](https://github.com/looker-open-source/sdk-codegen/commit/417db6a32efbf61c1fe17a50ed48448229eea2bf))
+
 ## [25.4.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-codegen-all-v25.2.0...sdk-codegen-all-v25.4.0) (2025-03-11)
 
 

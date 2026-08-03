@@ -61,7 +61,7 @@ namespace Looker.RTL
 
         public const string DefaultApiVersion = "4.0";
         public const string AgentPrefix = "CS-SDK";
-        public const string LookerVersion = "25.4";
+        public const string LookerVersion = "26.12";
 
         public const string Bearer = "Bearer";
         public const string LookerAppiId = "x-looker-appid";
@@ -78,6 +78,13 @@ namespace Looker.RTL
     /// Concrete implementation of IValues for easy population of values
     /// </summary>
     public class Values : Dictionary<string, object>, IValues
+    {
+    }
+
+    /// <summary>
+    /// Type for explicitly specifying url-encoded form values
+    /// </summary>
+    public class FormValues : Values
     {
     }
 }

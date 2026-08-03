@@ -25,7 +25,7 @@
  */
 
 /**
- * 469 API methods
+ * 518 API methods
  */
 
 import type {
@@ -43,6 +43,7 @@ import { APIMethods, agentPrefix, encodeParam } from '@looker/sdk-rtl';
 import { sdkVersion } from '../constants';
 import type {
   IAccessToken,
+  IAgent,
   IAlert,
   IAlertNotifications,
   IAlertPatch,
@@ -51,10 +52,14 @@ import type {
   IArtifact,
   IArtifactNamespace,
   IArtifactUsage,
+  IAsyncDeployResponse,
   IBackupConfiguration,
   IBoard,
   IBoardItem,
   IBoardSection,
+  ICertification,
+  IChatMessage,
+  ICIRun,
   IColorCollection,
   IColumnSearch,
   IConnectionFeatures,
@@ -65,7 +70,13 @@ import type {
   IContentSummary,
   IContentValidation,
   IContentView,
+  IConversation,
+  IConversationalAnalyticsChatRequest,
+  IConversationMessage,
   ICostEstimate,
+  ICreateCIRunRequest,
+  ICreateCIRunResponse,
+  ICreateContinuousIntegrationRunRequest,
   ICreateCostEstimate,
   ICreateCredentialsApi3,
   ICreateEmbedUserRequest,
@@ -98,6 +109,7 @@ import type {
   IDBConnection,
   IDBConnectionTestResult,
   IDependencyGraph,
+  IDeployStatusResponse,
   IDialectInfo,
   IDigestEmails,
   IDigestEmailSend,
@@ -116,6 +128,8 @@ import type {
   IGitBranch,
   IGitConnectionTest,
   IGitConnectionTestResult,
+  IGitDiagnosticReport,
+  IGoldenQuery,
   IGroup,
   IGroupHierarchy,
   IGroupIdForGroupInclusion,
@@ -124,10 +138,13 @@ import type {
   IHomepageSection,
   IIntegration,
   IIntegrationHub,
+  IIntegrationHubHealthResult,
   IIntegrationTestResult,
   IInternalHelpResources,
   IInternalHelpResourcesContent,
   IJsonBi,
+  IKdaRequestPayload,
+  IKdaResponsePayload,
   ILDAPConfig,
   ILDAPConfigTestResult,
   ILegacyFeature,
@@ -153,6 +170,7 @@ import type {
   IPermissionSet,
   IProject,
   IProjectFile,
+  IProjectRun,
   IProjectValidation,
   IProjectValidationCache,
   IProjectWorkspace,
@@ -176,6 +194,7 @@ import type {
   IRequestAllUsers,
   IRequestArtifact,
   IRequestArtifactNamespaces,
+  IRequestAsyncDeployRefToProduction,
   IRequestConnectionColumns,
   IRequestConnectionSchemas,
   IRequestConnectionSearchColumns,
@@ -204,12 +223,14 @@ import type {
   IRequestScheduledPlansForDashboard,
   IRequestScheduledPlansForLook,
   IRequestScheduledPlansForLookmlDashboard,
+  IRequestSearchAgents,
   IRequestSearchAlerts,
   IRequestSearchArtifacts,
   IRequestSearchBoards,
   IRequestSearchContent,
   IRequestSearchContentFavorites,
   IRequestSearchContentViews,
+  IRequestSearchConversations,
   IRequestSearchCredentialsEmail,
   IRequestSearchDashboardElements,
   IRequestSearchDashboards,
@@ -217,6 +238,7 @@ import type {
   IRequestSearchGroups,
   IRequestSearchGroupsWithHierarchy,
   IRequestSearchGroupsWithRoles,
+  IRequestSearchLookmlDashboards,
   IRequestSearchLooks,
   IRequestSearchModelSets,
   IRequestSearchPermissionSets,
@@ -229,6 +251,7 @@ import type {
   IRequestSearchUsers,
   IRequestSearchUsersNames,
   IRequestStartPdtBuild,
+  IRequestSyncLookmlDashboard,
   IRequestTagRef,
   IRequestUserAttributeUserValues,
   IRequestUserRoles,
@@ -241,6 +264,7 @@ import type {
   ISchema,
   ISchemaColumns,
   ISchemaTables,
+  IServiceAccount,
   ISession,
   ISessionConfig,
   ISetting,
@@ -272,16 +296,22 @@ import type {
   IWelcomeEmailTest,
   IWhitelabelConfiguration,
   IWorkspace,
+  IWriteAgent,
   IWriteAlert,
   IWriteApiSession,
   IWriteBackupConfiguration,
   IWriteBoard,
   IWriteBoardItem,
   IWriteBoardSection,
+  IWriteCertification,
   IWriteColorCollection,
   IWriteContentFavorite,
   IWriteContentMeta,
+  IWriteConversation,
+  IWriteConversationMessage,
+  IWriteConversationMessages,
   IWriteCreateDashboardFilter,
+  IWriteCredentialsApi3,
   IWriteCredentialsEmail,
   IWriteDashboard,
   IWriteDashboardElement,
@@ -294,6 +324,8 @@ import type {
   IWriteEmbedSecret,
   IWriteExternalOauthApplication,
   IWriteGitBranch,
+  IWriteGitDiagnosticReport,
+  IWriteGoldenQuery,
   IWriteGroup,
   IWriteIntegration,
   IWriteIntegrationHub,
@@ -316,6 +348,7 @@ import type {
   IWriteRole,
   IWriteSamlConfig,
   IWriteScheduledPlan,
+  IWriteServiceAccount,
   IWriteSessionConfig,
   IWriteSetting,
   IWriteSqlInterfaceQueryCreate,
@@ -488,7 +521,7 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### Update select alert fields
-   * # Available fields: `owner_id`, `is_disabled`, `disabled_reason`, `is_public`, `threshold`
+   * # Available fields: `owner_id`, `is_disabled`, `disabled_reason`, `is_public`, `threshold`, `enhancements`
    * #
    *
    * PATCH /alerts/{alert_id} -> IAlert
@@ -689,7 +722,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Present client credentials to obtain an authorization token
    *
-   * Looker API implements the OAuth2 [Resource Owner Password Credentials Grant](https://cloud.google.com/looker/docs/r/api/outh2_resource_owner_pc) pattern.
+   * Looker API implements the OAuth2 [Resource Owner Password Credentials Grant](https://docs.cloud.google.com/looker/docs/r/api/outh2_resource_owner_pc) pattern.
    * The client credentials required for this login must be obtained by creating an API key on a user account
    * in the Looker Admin console. The API key consists of a public `client_id` and a private `client_secret`.
    *
@@ -701,8 +734,6 @@ export class Looker40SDKStream extends APIMethods {
    * Replace "4QDkCy..." with the `access_token` value returned by `login`.
    * The word `token` is a string literal and must be included exactly as shown.
    *
-   * This function can accept `client_id` and `client_secret` parameters as URL query params or as www-form-urlencoded params in the body of the HTTP request. Since there is a small risk that URL parameters may be visible to intermediate nodes on the network route (proxies, routers, etc), passing credentials in the body of the request is considered more secure than URL params.
-   *
    * Example of passing credentials in the HTTP request body:
    * ````
    * POST HTTP /login
@@ -711,10 +742,12 @@ export class Looker40SDKStream extends APIMethods {
    * client_id=CGc9B7v7J48dQSJvxxx&client_secret=nNVS9cSS3xNpSC9JdsBvvvvv
    * ````
    *
-   * ### Best Practice:
-   * Always pass credentials in body params. Pass credentials in URL query params **only** when you cannot pass body params due to application, tool, or other limitations.
+   * *NOTICE*
    *
-   * For more information and detailed examples of Looker API authorization, see [How to Authenticate to Looker API](https://github.com/looker/looker-sdk-ruby/blob/master/authentication.md).
+   * Pass 'client_id' and 'client_secret' as body parameters.
+   *
+   * The ability to use query parameters for `client_id` and `client_secret` will be deprecated
+   * before the end of 2026.
    *
    * POST /login -> IAccessToken
    *
@@ -732,8 +765,11 @@ export class Looker40SDKStream extends APIMethods {
       callback,
       'POST',
       '/login',
-      { client_id: request.client_id, client_secret: request.client_secret },
       null,
+      new URLSearchParams({
+        client_id: request.client_id,
+        client_secret: request.client_secret,
+      } as unknown as Record<string, string>),
       options
     );
   }
@@ -756,20 +792,21 @@ export class Looker40SDKStream extends APIMethods {
    *
    * See 'login' for more detail on the access token and how to use it.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * In [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview) this call will be denied unless all of the following criteria are met:
+   *   1. The calling user is an [API-only Service Account](https://docs.cloud.google.com/looker/docs/looker-core-user-management#creating_an_api-only_service_account) with the Admin role
+   *   2. The target user is an [Embed User type](https://docs.cloud.google.com/looker/docs/r/single-sign-on-embedding)
+   * Regular user types can not be impersonated in [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview). If your application needs to call the API for these users, use OAuth authentication instead.
    *
    * POST /login/{user_id} -> IAccessToken
    *
    * @param callback streaming output function
    * @param user_id Id of user.
-   * @param associative When true (default), API calls using the returned access_token are attributed to the admin user who created the access_token. When false, API activity is attributed to the user the access_token runs as. False requires a looker license.
    * @param options one-time API call overrides
    *
    */
   async login_user(
     callback: (response: Response) => Promise<IAccessToken>,
     user_id: string,
-    associative?: boolean,
     options?: Partial<ITransportSettings>
   ) {
     user_id = encodeParam(user_id);
@@ -777,7 +814,7 @@ export class Looker40SDKStream extends APIMethods {
       callback,
       'POST',
       `/login/${user_id}`,
-      { associative },
+      null,
       null,
       options
     );
@@ -1107,7 +1144,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * The value of the `secret` field will be set by Looker and returned.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * POST /embed_config/secrets -> IEmbedSecret
    *
@@ -1134,7 +1171,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Delete an embed secret.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * DELETE /embed_config/secrets/{embed_secret_id} -> string
    *
@@ -1187,7 +1224,7 @@ export class Looker40SDKStream extends APIMethods {
    * embed url is created. Unknown group_id, user attribute names or model names will be passed through to the output URL.
    * Because of this, **these parameters are not validated** when the API call is made.
    *
-   * The [Get Embed Url](https://cloud.google.com/looker/docs/r/get-signed-url) dialog can be used to determine and validate the correct permissions for signing an embed url.
+   * The [Get Embed Url](https://docs.cloud.google.com/looker/docs/r/get-signed-url) dialog can be used to determine and validate the correct permissions for signing an embed url.
    * This dialog also provides the SDK syntax for the API call to make. Alternatively, you can copy the signed URL into the Embed URI Validator text box
    * in `<your looker instance>/admin/embed` to diagnose potential problems.
    *
@@ -1203,7 +1240,7 @@ export class Looker40SDKStream extends APIMethods {
    * encrypted transport.
    *
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * POST /embed/sso_url -> IEmbedUrlResponse
    *
@@ -1234,7 +1271,7 @@ export class Looker40SDKStream extends APIMethods {
    * This embed URL can then be used to instantiate a Looker embed session in a
    * "Powered by Looker" (PBL) web application.
    *
-   * This is similar to Private Embedding (https://cloud.google.com/looker/docs/r/admin/embed/private-embed). Instead of
+   * This is similar to Private Embedding (https://docs.cloud.google.com/looker/docs/r/admin/embed/private-embed). Instead of
    * logging into the Web UI to authenticate, the user has already authenticated against the API to be able to
    * make this call. However, unlike Private Embed where the user has access to any other part of the Looker UI,
    * the embed web session created by requesting the EmbedUrlResponse.url in a browser only has access to
@@ -1253,9 +1290,6 @@ export class Looker40SDKStream extends APIMethods {
    * Protect this signed URL as you would an access token or password credentials - do not write
    * it to disk, do not pass it to a third party, and only pass it through a secure HTTPS
    * encrypted transport.
-   *
-   *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * POST /embed/token_url/me -> IEmbedUrlResponse
    *
@@ -1336,7 +1370,7 @@ export class Looker40SDKStream extends APIMethods {
    * - Navigation token - lives for 10 minutes. The Looker client will ask for this token once it is loaded into
    *   the iframe.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * POST /embed/cookieless_session/acquire -> IEmbedCookielessSessionAcquireResponse
    *
@@ -1369,7 +1403,7 @@ export class Looker40SDKStream extends APIMethods {
    * in the session and session reference data being cleared from the system. This endpoint can be used to log an embed
    * user out of the Looker instance.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * DELETE /embed/cookieless_session/{session_reference_token} -> string
    *
@@ -1410,7 +1444,7 @@ export class Looker40SDKStream extends APIMethods {
    * the session time to live in the `session_reference_token_ttl` response property. If this property
    * contains a zero, the embed session has expired.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * PUT /embed/cookieless_session/generate_tokens -> IEmbedCookielessSessionGenerateTokensResponse
    *
@@ -1452,9 +1486,9 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Looker will never return an **auth_password** field. That value can be set, but never retrieved.
    *
-   * See the [Looker LDAP docs](https://cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
+   * See the [Looker LDAP docs](https://docs.cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /ldap_config -> ILDAPConfig
    *
@@ -1487,9 +1521,9 @@ export class Looker40SDKStream extends APIMethods {
    *
    * It is **highly** recommended that any LDAP setting changes be tested using the APIs below before being set globally.
    *
-   * See the [Looker LDAP docs](https://cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
+   * See the [Looker LDAP docs](https://docs.cloud.google.com/looker/docs/r/api/ldap_setup) for additional information.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PATCH /ldap_config -> ILDAPConfig
    *
@@ -1533,7 +1567,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * The active LDAP settings are not modified.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /ldap_config/test_connection -> ILDAPConfigTestResult
    *
@@ -1579,7 +1613,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * The active LDAP settings are not modified.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /ldap_config/test_auth -> ILDAPConfigTestResult
    *
@@ -1614,7 +1648,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * The active LDAP settings are not modified.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /ldap_config/test_user_info -> ILDAPConfigTestResult
    *
@@ -1649,7 +1683,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * The active LDAP settings are not modified.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /ldap_config/test_user_auth -> ILDAPConfigTestResult
    *
@@ -2033,7 +2067,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * OIDC is enabled or disabled for Looker using the **enabled** field.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /oidc_config -> IOIDCConfig
    *
@@ -2066,7 +2100,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * It is **highly** recommended that any OIDC setting changes be tested using the APIs below before being set globally.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PATCH /oidc_config -> IOIDCConfig
    *
@@ -2093,7 +2127,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Get a OIDC test configuration by test_slug.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /oidc_test_configs/{test_slug} -> IOIDCConfig
    *
@@ -2121,7 +2155,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Delete a OIDC test configuration.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * DELETE /oidc_test_configs/{test_slug} -> string
    *
@@ -2149,7 +2183,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Create a OIDC test configuration.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /oidc_test_configs -> IOIDCConfig
    *
@@ -2176,7 +2210,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Get password config.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /password_config -> IPasswordConfig
    *
@@ -2201,7 +2235,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Update password config.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PATCH /password_config -> IPasswordConfig
    *
@@ -2228,7 +2262,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Force all credentials_email users to reset their login passwords upon their next login.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /password_config/force_password_reset_at_next_login_for_all_users -> string
    *
@@ -2264,7 +2298,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * SAML is enabled or disabled for Looker using the **enabled** field.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /saml_config -> ISamlConfig
    *
@@ -2297,7 +2331,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * It is **highly** recommended that any SAML setting changes be tested using the APIs below before being set globally.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PATCH /saml_config -> ISamlConfig
    *
@@ -2324,7 +2358,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Get a SAML test configuration by test_slug.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /saml_test_configs/{test_slug} -> ISamlConfig
    *
@@ -2352,7 +2386,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Delete a SAML test configuration.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * DELETE /saml_test_configs/{test_slug} -> string
    *
@@ -2380,7 +2414,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Create a SAML test configuration.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /saml_test_configs -> ISamlConfig
    *
@@ -2407,7 +2441,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Parse the given xml as a SAML IdP metadata document and return the result.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /parse_saml_idp_metadata -> ISamlMetadataParseResult
    *
@@ -2436,7 +2470,7 @@ export class Looker40SDKStream extends APIMethods {
    * Note that this requires that the url be public or at least at a location where the Looker instance
    * can fetch it without requiring any special authentication.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /fetch_and_parse_saml_idp_metadata -> ISamlMetadataParseResult
    *
@@ -2513,7 +2547,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Returns the users that have been added to the Support Access Allowlist
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /support_access/allowlist -> ISupportAccessAllowlistEntry[]
    *
@@ -2542,7 +2576,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Adds a list of emails to the Allowlist, using the provided reason
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /support_access/allowlist -> ISupportAccessAllowlistEntry[]
    *
@@ -2571,7 +2605,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Deletes the specified Allowlist Entry Id
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * DELETE /support_access/allowlist/{entry_id} -> string
    *
@@ -2601,7 +2635,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Enables Support Access for the provided duration
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /support_access/enable -> ISupportAccessStatus
    *
@@ -2630,7 +2664,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Disables Support Access immediately
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /support_access/disable -> ISupportAccessStatus
    *
@@ -2657,7 +2691,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Returns the current Support Access Status
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /support_access/status -> ISupportAccessStatus
    *
@@ -3736,7 +3770,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Returns the list of public egress IP Addresses for a hosted customer's instance
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /public_egress_ip_addresses -> IEgressIpAddresses
    *
@@ -3857,7 +3891,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Get all legacy features.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /legacy_features -> ILegacyFeature[]
    *
@@ -3882,7 +3916,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Get information about the legacy feature with a specific id.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /legacy_features/{legacy_feature_id} -> ILegacyFeature
    *
@@ -3910,7 +3944,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Update information about the legacy feature with a specific id.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PATCH /legacy_features/{legacy_feature_id} -> ILegacyFeature
    *
@@ -3988,6 +4022,8 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Available settings are:
    *  - allow_user_timezones
+   *  - auto_certify_lookml_content
+   *  - content_certification_documentation_link
    *  - custom_welcome_email
    *  - data_connector_default_enabled
    *  - dashboard_auto_refresh_restriction
@@ -3995,6 +4031,7 @@ export class Looker40SDKStream extends APIMethods {
    *  - extension_framework_enabled
    *  - extension_load_url_enabled
    *  - instance_config
+   *  - is_content_certification_enabled
    *  - managed_certificate_uri
    *  - marketplace_auto_install_enabled
    *  - marketplace_automation
@@ -4003,12 +4040,15 @@ export class Looker40SDKStream extends APIMethods {
    *  - marketplace_site
    *  - onboarding_enabled
    *  - privatelabel_configuration
+   *  - revoke_certification_on_edits
+   *  - automated_mfa_enabled
    *  - timezone
    *  - host_url
    *  - email_domain_allowlist
    *  - embed_cookieless_v2
    *  - embed_enabled
    *  - embed_config
+   *  - mcp_tools
    *
    * GET /setting -> ISetting
    *
@@ -4037,6 +4077,8 @@ export class Looker40SDKStream extends APIMethods {
    *
    * Available settings are:
    *  - allow_user_timezones
+   *  - auto_certify_lookml_content
+   *  - content_certification_documentation_link
    *  - custom_welcome_email
    *  - data_connector_default_enabled
    *  - dashboard_auto_refresh_restriction
@@ -4044,6 +4086,7 @@ export class Looker40SDKStream extends APIMethods {
    *  - extension_framework_enabled
    *  - extension_load_url_enabled
    *  - instance_config
+   *  - is_content_certification_enabled
    *  - managed_certificate_uri
    *  - marketplace_auto_install_enabled
    *  - marketplace_automation
@@ -4052,12 +4095,15 @@ export class Looker40SDKStream extends APIMethods {
    *  - marketplace_site
    *  - onboarding_enabled
    *  - privatelabel_configuration
+   *  - revoke_certification_on_edits
+   *  - automated_mfa_enabled
    *  - timezone
    *  - host_url
    *  - email_domain_allowlist
    *  - embed_cookieless_v2
    *  - embed_enabled
    *  - embed_config
+   *  - mcp_tools
    *
    * See the `Setting` type for more information on the specific values that can be configured.
    *
@@ -4622,6 +4668,34 @@ export class Looker40SDKStream extends APIMethods {
   }
 
   /**
+   * ### Delete an OAuth Application.
+   *
+   * This is an OAuth Application which Looker uses to access external systems.
+   *
+   * DELETE /external_oauth_applications/{client_id} -> string
+   *
+   * @param callback streaming output function
+   * @param client_id The client ID of the OAuth App to delete
+   * @param options one-time API call overrides
+   *
+   */
+  async delete_external_oauth_application(
+    callback: (response: Response) => Promise<string>,
+    client_id: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    client_id = encodeParam(client_id);
+    return this.authStream<string>(
+      callback,
+      'DELETE',
+      `/external_oauth_applications/${client_id}`,
+      null,
+      null,
+      options
+    );
+  }
+
+  /**
    * ### Create OAuth User state.
    *
    * POST /external_oauth_applications/user_state -> ICreateOAuthApplicationUserStateResponse
@@ -5036,6 +5110,8 @@ export class Looker40SDKStream extends APIMethods {
         dashboard_id: request.dashboard_id,
         look_id: request.look_id,
         board_id: request.board_id,
+        lookml_dashboard_id: request.lookml_dashboard_id,
+        include_board_items: request.include_board_items,
         limit: request.limit,
         offset: request.offset,
         sorts: request.sorts,
@@ -5565,6 +5641,615 @@ export class Looker40SDKStream extends APIMethods {
 
   //#endregion Content: Manage Content
 
+  //#region ConversationalAnalytics: Manage Conversations, Agents and Messages
+
+  /**
+   * ### Search Agents
+   *
+   * Returns an array of agent objects that match the specified search criteria.
+   *
+   * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+   *
+   * Get a **single agent** by id with [get_agent()](#!/Agent/get_agent)
+   *
+   * GET /agents/search -> IAgent[]
+   *
+   * @param callback streaming output function
+   * @param request composed interface "IRequestSearchAgents" for complex method parameters
+   * @param options one-time API call overrides
+   *
+   */
+  async search_agents(
+    callback: (response: Response) => Promise<IAgent[]>,
+    request: IRequestSearchAgents,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IAgent[]>(
+      callback,
+      'GET',
+      '/agents/search',
+      {
+        id: request.id,
+        name: request.name,
+        description: request.description,
+        created_by_user_id: request.created_by_user_id,
+        fields: request.fields,
+        limit: request.limit,
+        category: request.category,
+        offset: request.offset,
+        sorts: request.sorts,
+        filter_or: request.filter_or,
+        not_owned_by: request.not_owned_by,
+        deleted: request.deleted,
+        primary_agent_id: request.primary_agent_id,
+      },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Create Agent
+   *
+   * Creates an agent.
+   * Required fields: `name`, `description`, `sources`.
+   *
+   * POST /agents -> IAgent
+   *
+   * @param callback streaming output function
+   * @param body Partial<IWriteAgent>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async create_agent(
+    callback: (response: Response) => Promise<IAgent>,
+    body: Partial<IWriteAgent>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IAgent>(
+      callback,
+      'POST',
+      '/agents',
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Delete Agents
+   *
+   * Delete agents.
+   *
+   * DELETE /agents -> string
+   *
+   * @param callback streaming output function
+   * @param id Agent id. Can be a comma-separated list of ids.
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async delete_agent(
+    callback: (response: Response) => Promise<string>,
+    id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<string>(
+      callback,
+      'DELETE',
+      '/agents',
+      { id, fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Get Agent
+   *
+   * Get an agent.
+   *
+   * GET /agents/{agent_id} -> IAgent
+   *
+   * @param callback streaming output function
+   * @param agent_id Agent ID
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async get_agent(
+    callback: (response: Response) => Promise<IAgent>,
+    agent_id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    agent_id = encodeParam(agent_id);
+    return this.authStream<IAgent>(
+      callback,
+      'GET',
+      `/agents/${agent_id}`,
+      { fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Update Agent
+   *
+   * Update an agent.
+   *
+   * PATCH /agents/{agent_id} -> IAgent
+   *
+   * @param callback streaming output function
+   * @param agent_id Agent ID
+   * @param body Partial<IWriteAgent>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async update_agent(
+    callback: (response: Response) => Promise<IAgent>,
+    agent_id: string,
+    body: Partial<IWriteAgent>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    agent_id = encodeParam(agent_id);
+    return this.authStream<IAgent>(
+      callback,
+      'PATCH',
+      `/agents/${agent_id}`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Get All Conversation Messages
+   *
+   * Get all conversation messages.
+   *
+   * GET /conversations/{conversation_id}/messages -> IConversationMessage[]
+   *
+   * @param callback streaming output function
+   * @param conversation_id Conversation ID
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async all_conversation_messages(
+    callback: (response: Response) => Promise<IConversationMessage[]>,
+    conversation_id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    conversation_id = encodeParam(conversation_id);
+    return this.authStream<IConversationMessage[]>(
+      callback,
+      'GET',
+      `/conversations/${conversation_id}/messages`,
+      { fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Create Conversation Message
+   *
+   * Create one or more conversation messages.
+   * Required fields for each message: `type`, `message`.
+   *
+   * The `order` for a message will be determined based on the highest order for previously saved
+   * messages for the provided `conversation_id`.
+   *
+   * POST /conversations/{conversation_id}/messages -> IConversationMessage[]
+   *
+   * @param callback streaming output function
+   * @param conversation_id Conversation ID
+   * @param body Partial<IWriteConversationMessages>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async create_conversation_message(
+    callback: (response: Response) => Promise<IConversationMessage[]>,
+    conversation_id: string,
+    body: Partial<IWriteConversationMessages>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    conversation_id = encodeParam(conversation_id);
+    return this.authStream<IConversationMessage[]>(
+      callback,
+      'POST',
+      `/conversations/${conversation_id}/messages`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Delete Conversation Message
+   *
+   * Delete an conversation message.
+   *
+   * DELETE /conversations/{conversation_id}/messages -> string
+   *
+   * @param callback streaming output function
+   * @param conversation_id Conversation ID
+   * @param id Conversation message id. Can be a comma-separated list of ids.
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async delete_conversation_message(
+    callback: (response: Response) => Promise<string>,
+    conversation_id: string,
+    id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    conversation_id = encodeParam(conversation_id);
+    return this.authStream<string>(
+      callback,
+      'DELETE',
+      `/conversations/${conversation_id}/messages`,
+      { id, fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Get Conversation Message
+   *
+   * Get a conversation message.
+   *
+   * GET /conversations/{conversation_id}/messages/{message_id} -> IConversationMessage
+   *
+   * @param callback streaming output function
+   * @param conversation_id Conversation ID
+   * @param message_id Conversation Message ID
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async get_conversation_message(
+    callback: (response: Response) => Promise<IConversationMessage>,
+    conversation_id: string,
+    message_id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    conversation_id = encodeParam(conversation_id);
+    message_id = encodeParam(message_id);
+    return this.authStream<IConversationMessage>(
+      callback,
+      'GET',
+      `/conversations/${conversation_id}/messages/${message_id}`,
+      { fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Update Conversation Message
+   *
+   * Update an conversation message.
+   *
+   * PATCH /conversations/{conversation_id}/messages/{message_id} -> IConversationMessage
+   *
+   * @param callback streaming output function
+   * @param conversation_id Conversation ID
+   * @param message_id Conversation Message ID
+   * @param body Partial<IWriteConversationMessage>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async update_conversation_message(
+    callback: (response: Response) => Promise<IConversationMessage>,
+    conversation_id: string,
+    message_id: string,
+    body: Partial<IWriteConversationMessage>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    conversation_id = encodeParam(conversation_id);
+    message_id = encodeParam(message_id);
+    return this.authStream<IConversationMessage>(
+      callback,
+      'PATCH',
+      `/conversations/${conversation_id}/messages/${message_id}`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Search Conversations
+   *
+   * Returns an array of conversation objects that match the specified search criteria.
+   * This will only return conversations owned by the current user.
+   *
+   * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+   *
+   * Get a **single conversation** by id with [get_conversation()](#!/Conversation/get_conversation)
+   *
+   * GET /conversations/search -> IConversation[]
+   *
+   * @param callback streaming output function
+   * @param request composed interface "IRequestSearchConversations" for complex method parameters
+   * @param options one-time API call overrides
+   *
+   */
+  async search_conversations(
+    callback: (response: Response) => Promise<IConversation[]>,
+    request: IRequestSearchConversations,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IConversation[]>(
+      callback,
+      'GET',
+      '/conversations/search',
+      {
+        id: request.id,
+        name: request.name,
+        agent_id: request.agent_id,
+        fields: request.fields,
+        limit: request.limit,
+        offset: request.offset,
+        sorts: request.sorts,
+        filter_or: request.filter_or,
+        category: request.category,
+        deleted: request.deleted,
+      },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Create Conversation
+   *
+   * Creates a conversation.
+   * Required fields: `name`.
+   *
+   * POST /conversations -> IConversation
+   *
+   * @param callback streaming output function
+   * @param body Partial<IWriteConversation>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async create_conversation(
+    callback: (response: Response) => Promise<IConversation>,
+    body: Partial<IWriteConversation>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IConversation>(
+      callback,
+      'POST',
+      '/conversations',
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Delete Conversations
+   *
+   * Delete conversations.
+   *
+   * DELETE /conversations -> string
+   *
+   * @param callback streaming output function
+   * @param id Conversation id. Can be a comma-separated list of ids.
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async delete_conversation(
+    callback: (response: Response) => Promise<string>,
+    id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<string>(
+      callback,
+      'DELETE',
+      '/conversations',
+      { id, fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Get Conversation
+   *
+   * Get an conversation.
+   *
+   * GET /conversations/{conversation_id} -> IConversation
+   *
+   * @param callback streaming output function
+   * @param conversation_id Conversation ID
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async get_conversation(
+    callback: (response: Response) => Promise<IConversation>,
+    conversation_id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    conversation_id = encodeParam(conversation_id);
+    return this.authStream<IConversation>(
+      callback,
+      'GET',
+      `/conversations/${conversation_id}`,
+      { fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Update Conversation
+   *
+   * Update an conversation.
+   *
+   * PATCH /conversations/{conversation_id} -> IConversation
+   *
+   * @param callback streaming output function
+   * @param conversation_id Conversation ID
+   * @param body Partial<IWriteConversation>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async update_conversation(
+    callback: (response: Response) => Promise<IConversation>,
+    conversation_id: string,
+    body: Partial<IWriteConversation>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    conversation_id = encodeParam(conversation_id);
+    return this.authStream<IConversation>(
+      callback,
+      'PATCH',
+      `/conversations/${conversation_id}`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ## Takes the latest conversation context (ID and a user message) and
+   * ## returns a list of newly generated system messages.
+   *
+   * POST /conversational_analytics/chat -> IChatMessage[]
+   *
+   * @param callback streaming output function
+   * @param body Partial<IConversationalAnalyticsChatRequest>
+   * @param options one-time API call overrides
+   *
+   */
+  async conversational_analytics_chat(
+    callback: (response: Response) => Promise<IChatMessage[]>,
+    body: Partial<IConversationalAnalyticsChatRequest>,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IChatMessage[]>(
+      callback,
+      'POST',
+      '/conversational_analytics/chat',
+      null,
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Create Golden Query
+   *
+   * Creates a golden query.
+   *
+   * POST /golden_queries -> IGoldenQuery
+   *
+   * @param callback streaming output function
+   * @param body Partial<IWriteGoldenQuery>
+   * @param options one-time API call overrides
+   *
+   */
+  async create_golden_query(
+    callback: (response: Response) => Promise<IGoldenQuery>,
+    body: Partial<IWriteGoldenQuery>,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IGoldenQuery>(
+      callback,
+      'POST',
+      '/golden_queries',
+      null,
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Update Golden Query
+   *
+   * Updates a golden query.
+   *
+   * PATCH /golden_queries/{golden_query_id} -> IGoldenQuery
+   *
+   * @param callback streaming output function
+   * @param golden_query_id Golden Query ID
+   * @param body Partial<IWriteGoldenQuery>
+   * @param options one-time API call overrides
+   *
+   */
+  async update_golden_query(
+    callback: (response: Response) => Promise<IGoldenQuery>,
+    golden_query_id: number,
+    body: Partial<IWriteGoldenQuery>,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IGoldenQuery>(
+      callback,
+      'PATCH',
+      `/golden_queries/${golden_query_id}`,
+      null,
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Delete Golden Query
+   *
+   * Deletes a golden query by ID.
+   *
+   * DELETE /golden_queries/{golden_query_id} -> string
+   *
+   * @param callback streaming output function
+   * @param golden_query_id Golden Query ID
+   * @param options one-time API call overrides
+   *
+   */
+  async delete_golden_query(
+    callback: (response: Response) => Promise<string>,
+    golden_query_id: number,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<string>(
+      callback,
+      'DELETE',
+      `/golden_queries/${golden_query_id}`,
+      null,
+      null,
+      options
+    );
+  }
+
+  //#endregion ConversationalAnalytics: Manage Conversations, Agents and Messages
+
   //#region Dashboard: Manage Dashboards
 
   /**
@@ -5761,6 +6446,8 @@ export class Looker40SDKStream extends APIMethods {
    * Any UDD (a dashboard which exists in the Looker database rather than as a LookML file) which has a `lookml_link_id`
    * property value referring to a LookML dashboard's id (model::dashboardname) will be updated so that it matches the current state of the LookML dashboard.
    *
+   * If the dashboard_ids parameter is specified, only the dashboards with the specified ids will be updated.
+   *
    * For this operation to succeed the user must have permission to view the LookML dashboard, and only linked dashboards
    * that the user has permission to update will be synced.
    *
@@ -5769,26 +6456,22 @@ export class Looker40SDKStream extends APIMethods {
    * PATCH /dashboards/{lookml_dashboard_id}/sync -> number[]
    *
    * @param callback streaming output function
-   * @param lookml_dashboard_id Id of LookML dashboard, in the form 'model::dashboardname'
-   * @param body Partial<IWriteDashboard>
-   * @param raw_locale If true, and this dashboard is localized, export it with the raw keys, not localized.
+   * @param request composed interface "Partial<IRequestSyncLookmlDashboard>" for complex method parameters
    * @param options one-time API call overrides
    *
    */
   async sync_lookml_dashboard(
     callback: (response: Response) => Promise<number[]>,
-    lookml_dashboard_id: string,
-    body: Partial<IWriteDashboard>,
-    raw_locale?: boolean,
+    request: Partial<IRequestSyncLookmlDashboard>,
     options?: Partial<ITransportSettings>
   ) {
-    lookml_dashboard_id = encodeParam(lookml_dashboard_id);
+    request.lookml_dashboard_id = encodeParam(request.lookml_dashboard_id);
     return this.authStream<number[]>(
       callback,
       'PATCH',
-      `/dashboards/${lookml_dashboard_id}/sync`,
-      { raw_locale },
-      body,
+      `/dashboards/${request.lookml_dashboard_id}/sync`,
+      { raw_locale: request.raw_locale, dashboard_ids: request.dashboard_ids },
+      null,
       options
     );
   }
@@ -5919,6 +6602,68 @@ export class Looker40SDKStream extends APIMethods {
       'GET',
       `/dashboards/aggregate_table_lookml/${dashboard_id}`,
       null,
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Search LookML Dashboards
+   *
+   * Returns an array of **LookML Dashboard** objects that match the specified search criteria.
+   * Note, this only returns LookML Dashboards in production.
+   *
+   * If multiple search params are given and `filter_or` is FALSE or not specified,
+   * search params are combined in a logical AND operation.
+   * Only rows that match *all* search param criteria will be returned.
+   *
+   * If `filter_or` is TRUE, multiple search params are combined in a logical OR operation.
+   * Results will include rows that match **any** of the search criteria.
+   *
+   * String search params use case-insensitive matching.
+   * String search params can contain `%` and '_' as SQL LIKE pattern match wildcard expressions.
+   * example="dan%" will match "danger" and "Danzig" but not "David"
+   * example="D_m%" will match "Damage" and "dump"
+   *
+   * Integer search params can accept a single value or a comma separated list of values. The multiple
+   * values will be combined under a logical OR operation - results will match at least one of
+   * the given values.
+   *
+   * Most search params can accept "IS NULL" and "NOT NULL" as special expressions to match
+   * or exclude (respectively) rows where the column is null.
+   *
+   * Boolean search params accept only "true" and "false" as values.
+   *
+   *
+   * The parameters `limit`, and `offset` are recommended for fetching results in page-size chunks.
+   *
+   * Get a **single LookML dashboard** by id with [dashboard_lookml()](#!/Dashboard/dashboard_lookml)
+   *
+   * GET /dashboards/lookml/search -> IDashboardLookml
+   *
+   * @param callback streaming output function
+   * @param request composed interface "IRequestSearchLookmlDashboards" for complex method parameters
+   * @param options one-time API call overrides
+   *
+   */
+  async search_lookml_dashboards(
+    callback: (response: Response) => Promise<IDashboardLookml>,
+    request: IRequestSearchLookmlDashboards,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IDashboardLookml>(
+      callback,
+      'GET',
+      '/dashboards/lookml/search',
+      {
+        folder_id: request.folder_id,
+        title: request.title,
+        content_favorite_id: request.content_favorite_id,
+        fields: request.fields,
+        limit: request.limit,
+        offset: request.offset,
+        sorts: request.sorts,
+      },
       null,
       options
     );
@@ -6081,6 +6826,62 @@ export class Looker40SDKStream extends APIMethods {
       `/dashboards/${dashboard_id}/copy`,
       { folder_id },
       null,
+      options
+    );
+  }
+
+  /**
+   * ### Update dashboard certification
+   *
+   * PATCH /dashboards/{dashboard_id}/certification -> IDashboard
+   *
+   * @param callback streaming output function
+   * @param dashboard_id Dashboard id to update certification.
+   * @param body Partial<IWriteCertification>
+   * @param options one-time API call overrides
+   *
+   */
+  async update_dashboard_certification(
+    callback: (response: Response) => Promise<IDashboard>,
+    dashboard_id: string,
+    body: Partial<IWriteCertification>,
+    options?: Partial<ITransportSettings>
+  ) {
+    dashboard_id = encodeParam(dashboard_id);
+    return this.authStream<IDashboard>(
+      callback,
+      'PATCH',
+      `/dashboards/${dashboard_id}/certification`,
+      null,
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Update LookML dashboard certification
+   *
+   * PATCH /dashboards/lookml/{dashboard_id}/certification -> IDashboard
+   *
+   * @param callback streaming output function
+   * @param dashboard_id LookML Dashboard id to update certification.
+   * @param body Partial<IWriteCertification>
+   * @param options one-time API call overrides
+   *
+   */
+  async update_lookml_certification(
+    callback: (response: Response) => Promise<IDashboard>,
+    dashboard_id: string,
+    body: Partial<IWriteCertification>,
+    options?: Partial<ITransportSettings>
+  ) {
+    dashboard_id = encodeParam(dashboard_id);
+    return this.authStream<IDashboard>(
+      callback,
+      'PATCH',
+      `/dashboards/lookml/${dashboard_id}/certification`,
+      null,
+      body,
       options
     );
   }
@@ -6637,6 +7438,59 @@ export class Looker40SDKStream extends APIMethods {
       'POST',
       '/dashboard_layouts',
       { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Get Dashboard Filter State
+   * Returns the stored filter state for a given GUID.
+   *
+   * GET /dashboard_filter_state/{guid} -> string
+   *
+   * @param callback streaming output function
+   * @param guid GUID of the filter state
+   * @param options one-time API call overrides
+   *
+   */
+  async dashboard_filter_state(
+    callback: (response: Response) => Promise<string>,
+    guid: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    guid = encodeParam(guid);
+    return this.authStream<string>(
+      callback,
+      'GET',
+      `/dashboard_filter_state/${guid}`,
+      null,
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Create Dashboard Filter State
+   * Saves the filter state and returns a GUID.
+   *
+   * POST /dashboard_filter_state -> IDashboard
+   *
+   * @param callback streaming output function
+   * @param body string
+   * @param options one-time API call overrides
+   *
+   */
+  async create_dashboard_filter_state(
+    callback: (response: Response) => Promise<IDashboard>,
+    body: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IDashboard>(
+      callback,
+      'POST',
+      '/dashboard_filter_state',
+      null,
       body,
       options
     );
@@ -8011,6 +8865,34 @@ export class Looker40SDKStream extends APIMethods {
   }
 
   /**
+   * Checks to see if the user is able to connect to their integration hub
+   *
+   * GET /integration_hubs/{integration_hub_id}/health -> IIntegrationHubHealthResult
+   *
+   * @param callback streaming output function
+   * @param integration_hub_id Id of integration_hub
+   * @param fields Requested fields.
+   * @param options one-time API call overrides
+   *
+   */
+  async get_integration_hub_health(
+    callback: (response: Response) => Promise<IIntegrationHubHealthResult>,
+    integration_hub_id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    integration_hub_id = encodeParam(integration_hub_id);
+    return this.authStream<IIntegrationHubHealthResult>(
+      callback,
+      'GET',
+      `/integration_hubs/${integration_hub_id}/health`,
+      { fields },
+      null,
+      options
+    );
+  }
+
+  /**
    * Accepts the legal agreement for a given integration hub. This only works for integration hubs that have legal_agreement_required set to true and legal_agreement_signed set to false.
    *
    * POST /integration_hubs/{integration_hub_id}/accept_legal_agreement -> IIntegrationHub
@@ -8177,6 +9059,44 @@ export class Looker40SDKStream extends APIMethods {
   }
 
   //#endregion Integration: Manage Integrations
+
+  //#region KeyDriverAnalysis: Run Key Driver Analysis
+
+  /**
+   * ### Analyze Key Drivers
+   *
+   * Identifies the dimensional segments that most significantly drove a metric's change between two time periods.
+   *
+   * Given a data source (a saved query or a model/explore pair), a contribution metric, and a list of
+   * dimensions to analyse, this endpoint compares a test (breach) period against a control (baseline)
+   * period and returns a ranked list of segment-level insights.
+   * Each insight reports the metric value in both periods, the absolute and relative difference,
+   * the unexpected deviation (how much a segment over or under-performed relative to the overall trend),
+   * its proportional contribution to the total change, and its a-priori support (what share of total volume that segment represents).
+   *
+   * POST /internal/kda/analyze -> IKdaResponsePayload
+   *
+   * @param callback streaming output function
+   * @param body Partial<IKdaRequestPayload>
+   * @param options one-time API call overrides
+   *
+   */
+  async run_key_driver_analysis(
+    callback: (response: Response) => Promise<IKdaResponsePayload>,
+    body: Partial<IKdaRequestPayload>,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IKdaResponsePayload>(
+      callback,
+      'POST',
+      '/internal/kda/analyze',
+      null,
+      body,
+      options
+    );
+  }
+
+  //#endregion KeyDriverAnalysis: Run Key Driver Analysis
 
   //#region Look: Run and Manage Looks
 
@@ -8553,6 +9473,34 @@ export class Looker40SDKStream extends APIMethods {
     );
   }
 
+  /**
+   * ### Update look certification
+   *
+   * PATCH /looks/{look_id}/certification -> ILook
+   *
+   * @param callback streaming output function
+   * @param look_id Look id to update certification.
+   * @param body Partial<IWriteCertification>
+   * @param options one-time API call overrides
+   *
+   */
+  async update_look_certification(
+    callback: (response: Response) => Promise<ILook>,
+    look_id: string,
+    body: Partial<IWriteCertification>,
+    options?: Partial<ITransportSettings>
+  ) {
+    look_id = encodeParam(look_id);
+    return this.authStream<ILook>(
+      callback,
+      'PATCH',
+      `/looks/${look_id}/certification`,
+      null,
+      body,
+      options
+    );
+  }
+
   //#endregion Look: Run and Manage Looks
 
   //#region LookmlModel: Manage LookML Models
@@ -8583,6 +9531,7 @@ export class Looker40SDKStream extends APIMethods {
         exclude_empty: request.exclude_empty,
         exclude_hidden: request.exclude_hidden,
         include_internal: request.include_internal,
+        include_self_service: request.include_self_service,
       },
       null,
       options
@@ -9034,6 +9983,136 @@ export class Looker40SDKStream extends APIMethods {
   //#region Project: Manage Projects
 
   /**
+   * ### Fetches a CI Run.
+   *
+   * This endpoint is deprecated. [Get Continuous Integration Run](#!/Project/get_continuous_integration_run) should be used instead.
+   *
+   * GET /projects/{project_id}/ci/runs/{run_id} -> IProjectRun
+   *
+   * @deprecated
+   *
+   * @param callback streaming output function
+   * @param project_id Project Id
+   * @param run_id Run Id
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async get_ci_run(
+    callback: (response: Response) => Promise<IProjectRun>,
+    project_id: string,
+    run_id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    run_id = encodeParam(run_id);
+    return this.authStream<IProjectRun>(
+      callback,
+      'GET',
+      `/projects/${project_id}/ci/runs/${run_id}`,
+      { fields },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Creates a CI Run.
+   *
+   * This endpoint is deprecated. [Create Continuous Integration Run](#!/Project/create_continuous_integration_run) should be used instead.
+   *
+   * POST /projects/{project_id}/ci/run -> ICreateCIRunResponse
+   *
+   * @deprecated
+   *
+   * @param callback streaming output function
+   * @param project_id Project Id
+   * @param body Partial<ICreateCIRunRequest>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async create_ci_run(
+    callback: (response: Response) => Promise<ICreateCIRunResponse>,
+    project_id: string,
+    body: Partial<ICreateCIRunRequest>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    return this.authStream<ICreateCIRunResponse>(
+      callback,
+      'POST',
+      `/projects/${project_id}/ci/run`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Creates and queues a Continuous Integration Run.
+   *
+   * POST /projects/{project_id}/continuous_integration/runs -> ICIRun
+   *
+   * @param callback streaming output function
+   * @param project_id Project Id
+   * @param body Partial<ICreateContinuousIntegrationRunRequest>
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async create_continuous_integration_run(
+    callback: (response: Response) => Promise<ICIRun>,
+    project_id: string,
+    body: Partial<ICreateContinuousIntegrationRunRequest>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    return this.authStream<ICIRun>(
+      callback,
+      'POST',
+      `/projects/${project_id}/continuous_integration/runs`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Gets a Continuous Integration run.
+   *
+   * GET /projects/{project_id}/continuous_integration/runs/{run_id} -> ICIRun
+   *
+   * @param callback streaming output function
+   * @param project_id Project Id
+   * @param run_id Run Id
+   * @param fields Requested fields
+   * @param options one-time API call overrides
+   *
+   */
+  async get_continuous_integration_run(
+    callback: (response: Response) => Promise<ICIRun>,
+    project_id: string,
+    run_id: string,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    run_id = encodeParam(run_id);
+    return this.authStream<ICIRun>(
+      callback,
+      'GET',
+      `/projects/${project_id}/continuous_integration/runs/${run_id}`,
+      { fields },
+      null,
+      options
+    );
+  }
+
+  /**
    * ### Generate Lockfile for All LookML Dependencies
    *
    *       Git must have been configured, must be in dev mode and deploy permission required
@@ -9291,6 +10370,66 @@ export class Looker40SDKStream extends APIMethods {
   }
 
   /**
+   * ### Asynchronously Deploy a Remote Branch or Ref to Production
+   *
+   * Git must have been configured and deploy permission required.
+   * This endpoint kicks off the deploy process and returns immediately.
+   *
+   * Can only specify either a branch or a ref.
+   *
+   * POST /projects/{project_id}/async_deploy_ref_to_production -> IAsyncDeployResponse
+   *
+   * @param callback streaming output function
+   * @param request composed interface "IRequestAsyncDeployRefToProduction" for complex method parameters
+   * @param options one-time API call overrides
+   *
+   */
+  async async_deploy_ref_to_production(
+    callback: (response: Response) => Promise<IAsyncDeployResponse>,
+    request: IRequestAsyncDeployRefToProduction,
+    options?: Partial<ITransportSettings>
+  ) {
+    request.project_id = encodeParam(request.project_id);
+    return this.authStream<IAsyncDeployResponse>(
+      callback,
+      'POST',
+      `/projects/${request.project_id}/async_deploy_ref_to_production`,
+      { branch: request.branch, ref: request.ref },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Check Status of Asynchronous Deploy
+   * Get the status of an asynchronous deploy operation.
+   *
+   * GET /projects/{project_id}/deploy_status/{deployment_id} -> IDeployStatusResponse
+   *
+   * @param callback streaming output function
+   * @param project_id Id of project
+   * @param deployment_id Id of deployment
+   * @param options one-time API call overrides
+   *
+   */
+  async async_deploy_status(
+    callback: (response: Response) => Promise<IDeployStatusResponse>,
+    project_id: string,
+    deployment_id: number,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    return this.authStream<IDeployStatusResponse>(
+      callback,
+      'GET',
+      `/projects/${project_id}/deploy_status/${deployment_id}`,
+      null,
+      null,
+      options
+    );
+  }
+
+  /**
    * ### Deploy LookML from this Development Mode Project to Production
    *
    * Git must have been configured, must be in dev mode and deploy permission required
@@ -9489,6 +10628,10 @@ export class Looker40SDKStream extends APIMethods {
    * When you modify a project's `git_remote_url`, Looker connects to the remote repository to fetch
    * metadata. The remote git repository MUST be configured with the Looker-generated deploy
    * key for this project prior to setting the project's `git_remote_url`.
+   *
+   * Note that Looker will validate the git connection when the `git_remote_url` is modified.
+   * If Looker cannot connect to the remote repository (e.g. because the deploy key has not
+   * been added), the update will fail with a 400 Bad Request error.
    *
    * To set up a Looker project with a git repository residing on the Looker server (a 'bare' git repo):
    *
@@ -9782,9 +10925,6 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Get All Git Connection Tests
    *
-   * dev mode required.
-   *   - Call `update_session` to select the 'dev' workspace.
-   *
    * Returns a list of tests which can be run against a project's (or the dependency project for the provided remote_url) git connection. Call [Run Git Connection Test](#!/Project/run_git_connection_test) to execute each test in sequence.
    *
    * Tests are ordered by increasing specificity. Tests should be run in the order returned because later tests require functionality tested by tests earlier in the test list.
@@ -9938,6 +11078,94 @@ export class Looker40SDKStream extends APIMethods {
         tag_message: request.tag_message,
       },
       request.body,
+      options
+    );
+  }
+
+  /**
+   * ### Initiate Git Diagnosis Suite
+   *
+   * POST /projects/{project_id}/git_diagnostic_report -> IGitDiagnosticReport
+   *
+   * @param callback streaming output function
+   * @param project_id Looker Project ID
+   * @param body Partial<IWriteGitDiagnosticReport>
+   * @param options one-time API call overrides
+   *
+   */
+  async create_git_diagnostic_report(
+    callback: (response: Response) => Promise<IGitDiagnosticReport>,
+    project_id: string,
+    body: Partial<IWriteGitDiagnosticReport>,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    return this.authStream<IGitDiagnosticReport>(
+      callback,
+      'POST',
+      `/projects/${project_id}/git_diagnostic_report`,
+      null,
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Retrieve Live Git Diagnostic Suite Execution Status
+   *
+   * GET /projects/{project_id}/git_diagnostic_report/{report_id} -> IGitDiagnosticReport
+   *
+   * @param callback streaming output function
+   * @param project_id Looker Project ID
+   * @param report_id Report ID
+   * @param options one-time API call overrides
+   *
+   */
+  async get_git_diagnostic_report(
+    callback: (response: Response) => Promise<IGitDiagnosticReport>,
+    project_id: string,
+    report_id: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    report_id = encodeParam(report_id);
+    return this.authStream<IGitDiagnosticReport>(
+      callback,
+      'GET',
+      `/projects/${project_id}/git_diagnostic_report/${report_id}`,
+      null,
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Repair Git Configuration Issues
+   *
+   * POST /projects/{project_id}/git_diagnostic_report/{report_id}/repair -> IGitDiagnosticReport
+   *
+   * @param callback streaming output function
+   * @param project_id Looker Project ID
+   * @param report_id Report ID
+   * @param body Partial<IWriteGitDiagnosticReport>
+   * @param options one-time API call overrides
+   *
+   */
+  async repair_git_diagnostic_report(
+    callback: (response: Response) => Promise<IGitDiagnosticReport>,
+    project_id: string,
+    report_id: string,
+    body: Partial<IWriteGitDiagnosticReport>,
+    options?: Partial<ITransportSettings>
+  ) {
+    project_id = encodeParam(project_id);
+    report_id = encodeParam(report_id);
+    return this.authStream<IGitDiagnosticReport>(
+      callback,
+      'POST',
+      `/projects/${project_id}/git_diagnostic_report/${report_id}/repair`,
+      null,
+      body,
       options
     );
   }
@@ -10379,8 +11607,6 @@ export class Looker40SDKStream extends APIMethods {
         path_prefix: request.path_prefix,
         rebuild_pdts: request.rebuild_pdts,
         server_table_calcs: request.server_table_calcs,
-        source: request.source,
-        enable_oauth_error_response: request.enable_oauth_error_response,
       },
       null,
       options
@@ -10473,7 +11699,6 @@ export class Looker40SDKStream extends APIMethods {
         path_prefix: request.path_prefix,
         rebuild_pdts: request.rebuild_pdts,
         server_table_calcs: request.server_table_calcs,
-        enable_oauth_error_response: request.enable_oauth_error_response,
       },
       request.body,
       options
@@ -11126,6 +12351,7 @@ export class Looker40SDKStream extends APIMethods {
         all_access: request.all_access,
         built_in: request.built_in,
         filter_or: request.filter_or,
+        models: request.models,
       },
       null,
       options
@@ -11337,6 +12563,7 @@ export class Looker40SDKStream extends APIMethods {
         all_access: request.all_access,
         built_in: request.built_in,
         filter_or: request.filter_or,
+        permissions: request.permissions,
       },
       null,
       options
@@ -11496,7 +12723,11 @@ export class Looker40SDKStream extends APIMethods {
       callback,
       'GET',
       '/roles',
-      { fields: request.fields, ids: request.ids },
+      {
+        fields: request.fields,
+        ids: request.ids,
+        get_all_support_roles: request.get_all_support_roles,
+      },
       null,
       options
     );
@@ -11575,10 +12806,11 @@ export class Looker40SDKStream extends APIMethods {
         offset: request.offset,
         sorts: request.sorts,
         id: request.id,
+        model_set_ids: request.model_set_ids,
+        permission_set_ids: request.permission_set_ids,
         name: request.name,
         built_in: request.built_in,
         filter_or: request.filter_or,
-        is_support_role: request.is_support_role,
       },
       null,
       options
@@ -11754,7 +12986,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Set all groups for a role, removing all existing group associations from that role.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PUT /roles/{role_id}/groups -> IGroup[]
    *
@@ -11921,7 +13153,7 @@ export class Looker40SDKStream extends APIMethods {
    * #### Email Permissions:
    *
    * For details about permissions required to schedule delivery to email and the safeguards
-   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
    *
    *
    * #### Scheduled Plan Destination Formats
@@ -12067,7 +13299,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * When `run_as_recipient` is `true` and all the email recipients are Looker user accounts, the
    * queries are run in the context of each recipient, so different recipients may see different
-   * data from the same scheduled render of a look or dashboard. For more details, see [Run As Recipient](https://cloud.google.com/looker/docs/r/admin/run-as-recipient).
+   * data from the same scheduled render of a look or dashboard. For more details, see [Run As Recipient](https://docs.cloud.google.com/looker/docs/r/admin/run-as-recipient).
    *
    * Admins can create and modify scheduled plans on behalf of other users by specifying a user id.
    * Non-admin users may not create or modify scheduled plans by or for other users.
@@ -12075,7 +13307,7 @@ export class Looker40SDKStream extends APIMethods {
    * #### Email Permissions:
    *
    * For details about permissions required to schedule delivery to email and the safeguards
-   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
    *
    *
    * #### Scheduled Plan Destination Formats
@@ -12136,7 +13368,7 @@ export class Looker40SDKStream extends APIMethods {
    * #### Email Permissions:
    *
    * For details about permissions required to schedule delivery to email and the safeguards
-   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
    *
    *
    * #### Scheduled Plan Destination Formats
@@ -12375,7 +13607,7 @@ export class Looker40SDKStream extends APIMethods {
    * #### Email Permissions:
    *
    * For details about permissions required to schedule delivery to email and the safeguards
-   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://cloud.google.com/looker/docs/r/api/embed-permissions).
+   * Looker offers to protect against sending to unauthorized email destinations, see [Email Domain Allow List for Scheduled Looks](https://docs.cloud.google.com/looker/docs/r/api/embed-permissions).
    *
    *
    * #### Scheduled Plan Destination Formats
@@ -12430,6 +13662,92 @@ export class Looker40SDKStream extends APIMethods {
   }
 
   //#endregion ScheduledPlan: Manage Scheduled Plans
+
+  //#region SelfService: Self Service Models
+
+  /**
+   * ### Get Allowed Connections under advanced connection governance
+   *
+   * This endpoint returns the list of allowed connection names for self-service models
+   * when advanced connection governance is enabled.
+   *
+   * GET /self_service_models/allowed_connections -> string[]
+   *
+   * @param callback streaming output function
+   * @param google_sheets Include connections allowed for Google Sheets.
+   * @param options one-time API call overrides
+   *
+   */
+  async get_self_service_model_allowed_connections(
+    callback: (response: Response) => Promise<string[]>,
+    google_sheets?: boolean,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<string[]>(
+      callback,
+      'GET',
+      '/self_service_models/allowed_connections',
+      { google_sheets },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Get Generated LookML for a Self Service Model
+   *
+   * GET /self_service_models/{model_name}/lookml -> string
+   *
+   * @param callback streaming output function
+   * @param model_name Name of self service model
+   * @param options one-time API call overrides
+   *
+   */
+  async get_self_service_model_lookml(
+    callback: (response: Response) => Promise<string>,
+    model_name: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    model_name = encodeParam(model_name);
+    return this.authStream<string>(
+      callback,
+      'GET',
+      `/self_service_models/${model_name}/lookml`,
+      null,
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Update certification for a Self Service Explore
+   *
+   * PATCH /self_service_models/{model_name}/certification -> ICertification
+   *
+   * @param callback streaming output function
+   * @param model_name Name of self service model.
+   * @param body Partial<IWriteCertification>
+   * @param options one-time API call overrides
+   *
+   */
+  async update_self_service_explore_certification(
+    callback: (response: Response) => Promise<ICertification>,
+    model_name: string,
+    body: Partial<IWriteCertification>,
+    options?: Partial<ITransportSettings>
+  ) {
+    model_name = encodeParam(model_name);
+    return this.authStream<ICertification>(
+      callback,
+      'PATCH',
+      `/self_service_models/${model_name}/certification`,
+      null,
+      body,
+      options
+    );
+  }
+
+  //#endregion SelfService: Self Service Models
 
   //#region Session: Session Information
 
@@ -12649,7 +13967,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * **Permanently delete** an existing theme with [Delete Theme](#!/Theme/delete_theme)
    *
-   * For more information, see [Creating and Applying Themes](https://cloud.google.com/looker/docs/r/admin/themes).
+   * For more information, see [Creating and Applying Themes](https://docs.cloud.google.com/looker/docs/r/admin/themes).
    *
    * **Note**: Custom themes needs to be enabled by Looker. Unless custom themes are enabled, only the automatically generated default theme can be used. Please contact your Account Manager or https://console.cloud.google.com/support/cases/ to update your license for this feature.
    *
@@ -12741,6 +14059,7 @@ export class Looker40SDKStream extends APIMethods {
         sorts: request.sorts,
         fields: request.fields,
         filter_or: request.filter_or,
+        theme_type: request.theme_type,
       },
       null,
       options
@@ -12750,6 +14069,8 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Get the default theme
    *
+   * This endpoint is deprecated. [Get Default Theme (with type)](#!/Theme/default_theme_by_type) should be used instead.
+   *
    * Returns the active theme object set as the default.
    *
    * The **default** theme name can be set in the UI on the Admin|Theme UI page
@@ -12757,6 +14078,8 @@ export class Looker40SDKStream extends APIMethods {
    * The optional `ts` parameter can specify a different timestamp than "now." If specified, it returns the default theme at the time indicated.
    *
    * GET /themes/default -> ITheme
+   *
+   * @deprecated
    *
    * @param callback streaming output function
    * @param ts Timestamp representing the target datetime for the active period. Defaults to 'now'
@@ -12781,6 +14104,8 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Set the global default theme by theme name
    *
+   * This endpoint is deprecated. [Set Default Theme (with type)](#!/Theme/set_default_theme_by_type) should be used instead.
+   *
    * Only Admin users can call this function.
    *
    * Only an active theme with no expiration (`end_at` not set) can be assigned as the default theme. As long as a theme has an active record with no expiration, it can be set as the default.
@@ -12792,6 +14117,8 @@ export class Looker40SDKStream extends APIMethods {
    * **Note**: Custom themes needs to be enabled by Looker. Unless custom themes are enabled, only the automatically generated default theme can be used. Please contact your Account Manager or https://console.cloud.google.com/support/cases/ to update your license for this feature.
    *
    * PUT /themes/default -> ITheme
+   *
+   * @deprecated
    *
    * @param callback streaming output function
    * @param name Name of theme to set as default
@@ -12808,6 +14135,78 @@ export class Looker40SDKStream extends APIMethods {
       'PUT',
       '/themes/default',
       { name },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Get the default theme
+   *
+   * Returns the active theme object set as the default.
+   *
+   * The **default** theme name can be set in the UI on the Admin|Theme UI page
+   *
+   * The optional `ts` parameter can specify a different timestamp than "now." If specified, it returns the default theme at the time indicated.
+   *
+   * The optional `theme_type` parameter can specify the theme type to select for.
+   *
+   * GET /themes/default_theme -> ITheme
+   *
+   * @param callback streaming output function
+   * @param theme_type Theme type.
+   * @param ts Timestamp representing the target datetime for the active period. Defaults to 'now'
+   * @param options one-time API call overrides
+   *
+   */
+  async default_theme_by_type(
+    callback: (response: Response) => Promise<ITheme>,
+    theme_type: string,
+    ts?: Date,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<ITheme>(
+      callback,
+      'GET',
+      '/themes/default_theme',
+      { ts, theme_type },
+      null,
+      options
+    );
+  }
+
+  /**
+   * ### Set the global default theme by theme name
+   *
+   * Only Admin users can call this function.
+   *
+   * Only an active theme with no expiration (`end_at` not set) can be assigned as the default theme. As long as a theme has an active record with no expiration, it can be set as the default.
+   *
+   * [Create Theme](#!/Theme/create) has detailed information on rules for default and active themes
+   *
+   * Returns the new specified default theme object.
+   *
+   * The optional `theme_type` parameter can specify the theme type to select for.
+   *
+   * PUT /themes/default_theme -> ITheme
+   *
+   * @param callback streaming output function
+   * @param name Name of theme to set as default
+   * @param theme_type Theme type.
+   * @param options one-time API call overrides
+   *
+   */
+  async set_default_theme_by_type(
+    callback: (response: Response) => Promise<ITheme>,
+    name: string,
+    theme_type: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<ITheme>(
+      callback,
+      'PUT',
+      '/themes/default_theme',
+      { name, theme_type },
       null,
       options
     );
@@ -12840,7 +14239,12 @@ export class Looker40SDKStream extends APIMethods {
       callback,
       'GET',
       '/themes/active',
-      { name: request.name, ts: request.ts, fields: request.fields },
+      {
+        name: request.name,
+        ts: request.ts,
+        theme_type: request.theme_type,
+        fields: request.fields,
+      },
       null,
       options
     );
@@ -13036,7 +14440,7 @@ export class Looker40SDKStream extends APIMethods {
    * Boolean search params accept only "true" and "false" as values.
    *
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /credentials_email/search -> ICredentialsEmailSearch[]
    *
@@ -13212,6 +14616,7 @@ export class Looker40SDKStream extends APIMethods {
         id: request.id,
         first_name: request.first_name,
         last_name: request.last_name,
+        full_name: request.full_name,
         verified_looker_employee: request.verified_looker_employee,
         embed_user: request.embed_user,
         email: request.email,
@@ -13219,6 +14624,8 @@ export class Looker40SDKStream extends APIMethods {
         filter_or: request.filter_or,
         content_metadata_id: request.content_metadata_id,
         group_id: request.group_id,
+        can_manage_api3_creds: request.can_manage_api3_creds,
+        is_service_account: request.is_service_account,
       },
       null,
       options
@@ -13334,7 +14741,19 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Delete the user with a specific id.
    *
-   * **DANGER** this will delete the user and all looks and other information owned by the user.
+   * **This action cannot be undone.** If you want to keep the user's content, we recommend disabling their accounts instead of deleting them.
+   *
+   * Deletion will have the following impact:
+   * * Their reports, Looks and dashboards will be moved to Trash.
+   * * Any public URLs owned by them will no longer work.
+   * * Schedules created by the users or that use their content will be deleted.
+   * * Alerts will continue to run, but will not be visible or editable from the dashboard.
+   *
+   * The user cannot delete themselves.
+   * The last administrator user cannot be deleted.
+   *
+   * Deleting Service Accounts via this endpoint is deprecated and can be blocked in future versions.
+   * Please use the dedicated `delete_service_account` endpoint.
    *
    * DELETE /users/{user_id} -> string
    *
@@ -13389,7 +14808,7 @@ export class Looker40SDKStream extends APIMethods {
    *
    * **NOTE**: The 'api' credential type was only used with the legacy Looker query API and is no longer supported. The credential type for API you are currently looking at is 'api3'.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/credential/{credential_type}/{credential_id} -> IUser
    *
@@ -13420,9 +14839,77 @@ export class Looker40SDKStream extends APIMethods {
   }
 
   /**
+   * ### Update information for a specific service account. This action is restricted to Looker admins.
+   *
+   * This endpoint is exclusively for updating service accounts. To update a regular user, please use the `PATCH /api/3.x/users/:user_id` endpoint instead.
+   *
+   * PATCH /users/service_accounts/{user_id} -> IServiceAccount
+   *
+   * @param callback streaming output function
+   * @param user_id Id of service account
+   * @param body Partial<IWriteServiceAccount>
+   * @param fields Requested fields.
+   * @param options one-time API call overrides
+   *
+   */
+  async update_service_account(
+    callback: (response: Response) => Promise<IServiceAccount>,
+    user_id: string,
+    body: Partial<IWriteServiceAccount>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    user_id = encodeParam(user_id);
+    return this.authStream<IServiceAccount>(
+      callback,
+      'PATCH',
+      `/users/service_accounts/${user_id}`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Delete the service account with a specific id.
+   *
+   * **This action cannot be undone.** If you want to keep the service account's content, we recommend disabling their accounts instead of deleting them.
+   *
+   * Deletion will have the following impact:
+   * * Their reports, Looks and dashboards will be moved to Trash.
+   * * Any public URLs owned by them will no longer work.
+   * * Schedules created by the service account or that use their content will be deleted.
+   * * Alerts will continue to run, but will not be visible or editable from the dashboard.
+   *
+   * The service account cannot delete itself.
+   *
+   * DELETE /users/service_accounts/{user_id} -> string
+   *
+   * @param callback streaming output function
+   * @param user_id Id of service account user
+   * @param options one-time API call overrides
+   *
+   */
+  async delete_service_account(
+    callback: (response: Response) => Promise<string>,
+    user_id: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    user_id = encodeParam(user_id);
+    return this.authStream<string>(
+      callback,
+      'DELETE',
+      `/users/service_accounts/${user_id}`,
+      null,
+      null,
+      options
+    );
+  }
+
+  /**
    * ### Email/password login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_email -> ICredentialsEmail
    *
@@ -13452,7 +14939,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Email/password login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /users/{user_id}/credentials_email -> ICredentialsEmail
    *
@@ -13484,7 +14971,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Email/password login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * PATCH /users/{user_id}/credentials_email -> ICredentialsEmail
    *
@@ -13516,7 +15003,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Email/password login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * DELETE /users/{user_id}/credentials_email -> string
    *
@@ -13544,7 +15031,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Two-factor login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_totp -> ICredentialsTotp
    *
@@ -13574,7 +15061,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Two-factor login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /users/{user_id}/credentials_totp -> ICredentialsTotp
    *
@@ -13606,7 +15093,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Two-factor login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * DELETE /users/{user_id}/credentials_totp -> string
    *
@@ -13634,7 +15121,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### LDAP login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_ldap -> ICredentialsLDAP
    *
@@ -13664,7 +15151,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### LDAP login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * DELETE /users/{user_id}/credentials_ldap -> string
    *
@@ -13691,8 +15178,6 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### Google authentication login information for the specified user.
-   *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_google -> ICredentialsGoogle
    *
@@ -13722,8 +15207,6 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Google authentication login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-   *
    * DELETE /users/{user_id}/credentials_google -> string
    *
    * @param callback streaming output function
@@ -13749,8 +15232,6 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### Saml authentication login information for the specified user.
-   *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_saml -> ICredentialsSaml
    *
@@ -13780,8 +15261,6 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Saml authentication login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-   *
    * DELETE /users/{user_id}/credentials_saml -> string
    *
    * @param callback streaming output function
@@ -13807,8 +15286,6 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### OpenID Connect (OIDC) authentication login information for the specified user.
-   *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_oidc -> ICredentialsOIDC
    *
@@ -13838,8 +15315,6 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### OpenID Connect (OIDC) authentication login information for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-   *
    * DELETE /users/{user_id}/credentials_oidc -> string
    *
    * @param callback streaming output function
@@ -13865,8 +15340,6 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
-   *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_api3/{credentials_api3_id} -> ICredentialsApi3
    *
@@ -13899,7 +15372,38 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * PATCH /users/{user_id}/credentials_api3/{credentials_api3_id} -> ICredentialsApi3
+   *
+   * @param callback streaming output function
+   * @param user_id Id of user
+   * @param credentials_api3_id Id of API Credential
+   * @param body Partial<IWriteCredentialsApi3>
+   * @param fields Requested fields.
+   * @param options one-time API call overrides
+   *
+   */
+  async update_user_credentials_api3(
+    callback: (response: Response) => Promise<ICredentialsApi3>,
+    user_id: string,
+    credentials_api3_id: string,
+    body: Partial<IWriteCredentialsApi3>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    user_id = encodeParam(user_id);
+    credentials_api3_id = encodeParam(credentials_api3_id);
+    return this.authStream<ICredentialsApi3>(
+      callback,
+      'PATCH',
+      `/users/${user_id}/credentials_api3/${credentials_api3_id}`,
+      { fields },
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
    *
    * DELETE /users/{user_id}/credentials_api3/{credentials_api3_id} -> string
    *
@@ -13930,8 +15434,6 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-   *
    * GET /users/{user_id}/credentials_api3 -> ICredentialsApi3[]
    *
    * @param callback streaming output function
@@ -13959,8 +15461,6 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### API login information for the specified user. This is for the newer API keys that can be added for any user.
-   *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /users/{user_id}/credentials_api3 -> ICreateCredentialsApi3
    *
@@ -13990,7 +15490,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Embed login information for the specified user.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * GET /users/{user_id}/credentials_embed/{credentials_embed_id} -> ICredentialsEmbed
    *
@@ -14023,7 +15523,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Embed login information for the specified user.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * DELETE /users/{user_id}/credentials_embed/{credentials_embed_id} -> string
    *
@@ -14054,7 +15554,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Embed login information for the specified user.
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * GET /users/{user_id}/credentials_embed -> ICredentialsEmbed[]
    *
@@ -14084,7 +15584,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Looker Openid login information for the specified user. Used by Looker Analysts.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/credentials_looker_openid -> ICredentialsLookerOpenid
    *
@@ -14114,7 +15614,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Looker Openid login information for the specified user. Used by Looker Analysts.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * DELETE /users/{user_id}/credentials_looker_openid -> string
    *
@@ -14141,8 +15641,6 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### Web login session for the specified user.
-   *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/sessions/{session_id} -> ISession
    *
@@ -14175,8 +15673,6 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * ### Web login session for the specified user.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
-   *
    * DELETE /users/{user_id}/sessions/{session_id} -> string
    *
    * @param callback streaming output function
@@ -14205,8 +15701,6 @@ export class Looker40SDKStream extends APIMethods {
 
   /**
    * ### Web login session for the specified user.
-   *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * GET /users/{user_id}/sessions -> ISession[]
    *
@@ -14244,7 +15738,7 @@ export class Looker40SDKStream extends APIMethods {
    * The expire period is always 60 minutes when expires is enabled.
    * This method can be called with an empty body.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /users/{user_id}/credentials_email/password_reset -> ICredentialsEmail
    *
@@ -14450,7 +15944,7 @@ export class Looker40SDKStream extends APIMethods {
    * Password reset URLs will expire in 60 minutes.
    * This method can be called with an empty body.
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /users/{user_id}/credentials_email/send_password_reset -> ICredentialsEmail
    *
@@ -14486,7 +15980,7 @@ export class Looker40SDKStream extends APIMethods {
    * The user's 'is_disabled' status must be true.
    * If the user has a credential email, they will receive a verification email and the user will be disabled until they verify the email
    *
-   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://cloud.google.com/looker/docs/r/looker-core/overview).
+   * Calls to this endpoint may be denied by [Looker (Google Cloud core)](https://docs.cloud.google.com/looker/docs/r/looker-core/overview).
    *
    * POST /users/{user_id}/update_emails -> IUser
    *
@@ -14518,7 +16012,7 @@ export class Looker40SDKStream extends APIMethods {
   /**
    * Create an embed user from an external user ID
    *
-   * **NOTE**: Calls to this endpoint require [Embedding](https://cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
+   * **NOTE**: Calls to this endpoint require [Embedding](https://docs.cloud.google.com/looker/docs/r/looker-core-feature-embed) to be enabled. Usage of this endpoint is not authorized for Looker Core Standard and Looker Core Enterprise.
    *
    * POST /users/embed_user -> IUserPublic
    *
@@ -14537,6 +16031,33 @@ export class Looker40SDKStream extends APIMethods {
       'POST',
       '/users/embed_user',
       null,
+      body,
+      options
+    );
+  }
+
+  /**
+   * ### Create a service account with the specified information. This action is restricted to Looker admins.
+   *
+   * POST /users/service_accounts -> IServiceAccount
+   *
+   * @param callback streaming output function
+   * @param body Partial<IWriteServiceAccount>
+   * @param fields Requested fields.
+   * @param options one-time API call overrides
+   *
+   */
+  async create_service_account(
+    callback: (response: Response) => Promise<IServiceAccount>,
+    body: Partial<IWriteServiceAccount>,
+    fields?: string,
+    options?: Partial<ITransportSettings>
+  ) {
+    return this.authStream<IServiceAccount>(
+      callback,
+      'POST',
+      '/users/service_accounts',
+      { fields },
       body,
       options
     );

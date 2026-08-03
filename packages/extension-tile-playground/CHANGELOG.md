@@ -112,6 +112,118 @@
     * @looker/extension-sdk-react bumped from 25.2.0 to 25.4.0
     * @looker/sdk bumped from 25.2.0 to 25.4.0
 
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 25.4.0 to 25.6.0
+    * @looker/extension-sdk-react bumped from 25.4.0 to 25.6.0
+    * @looker/sdk bumped from 25.4.0 to 25.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 25.6.0 to 25.8.0
+    * @looker/extension-sdk-react bumped from 25.6.0 to 25.8.0
+    * @looker/sdk bumped from 25.6.0 to 25.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 25.8.0 to 25.10.0
+    * @looker/extension-sdk-react bumped from 25.8.0 to 25.10.0
+    * @looker/sdk bumped from 25.8.0 to 25.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 25.10.0 to 25.16.0
+    * @looker/extension-sdk-react bumped from 25.10.0 to 25.16.0
+    * @looker/sdk bumped from 25.10.0 to 25.16.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 25.16.0 to 25.18.0
+    * @looker/extension-sdk-react bumped from 25.16.0 to 25.18.0
+    * @looker/sdk bumped from 25.16.0 to 25.18.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 25.18.0 to 25.20.0
+    * @looker/extension-sdk-react bumped from 25.18.0 to 25.20.0
+    * @looker/sdk bumped from 25.18.0 to 25.20.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 25.20.0 to 26.0.0
+    * @looker/extension-sdk-react bumped from 25.20.0 to 26.0.0
+    * @looker/sdk bumped from 25.20.0 to 26.0.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 26.0.0 to 26.2.0
+    * @looker/extension-sdk-react bumped from 26.0.0 to 26.2.0
+    * @looker/sdk bumped from 26.0.0 to 26.2.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 26.2.0 to 26.4.0
+    * @looker/extension-sdk-react bumped from 26.2.0 to 26.4.0
+    * @looker/sdk bumped from 26.2.0 to 26.4.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 26.4.0 to 26.6.0
+    * @looker/extension-sdk-react bumped from 26.4.0 to 26.6.0
+    * @looker/sdk bumped from 26.4.0 to 26.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 26.6.0 to 26.6.1
+    * @looker/extension-sdk-react bumped from 26.6.0 to 26.6.1
+    * @looker/sdk bumped from 26.6.0 to 26.6.1
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 26.6.1 to 26.8.0
+    * @looker/extension-sdk-react bumped from 26.6.1 to 26.8.0
+    * @looker/sdk bumped from 26.6.1 to 26.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 26.8.0 to 26.10.0
+    * @looker/extension-sdk-react bumped from 26.8.0 to 26.10.0
+    * @looker/sdk bumped from 26.8.0 to 26.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/extension-sdk bumped from 26.10.0 to 26.12.0
+    * @looker/extension-sdk-react bumped from 26.10.0 to 26.12.0
+    * @looker/sdk bumped from 26.10.0 to 26.12.0
+
 ## [1.1.16](https://github.com/looker-open-source/sdk-codegen/compare/extension-tile-playground-v1.1.15...extension-tile-playground-v1.1.16) (2025-02-06)
 
 

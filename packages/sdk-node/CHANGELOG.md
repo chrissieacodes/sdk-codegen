@@ -5,6 +5,203 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [26.12.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v26.10.0...sdk-node-v26.12.0) (2026-07-13)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.10.0 to 26.12.0
+
+## [26.10.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v26.8.0...sdk-node-v26.10.0) (2026-06-08)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.8.0 to 26.10.0
+
+## [26.8.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v26.6.1...sdk-node-v26.8.0) (2026-05-11)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.6.1 to 26.8.0
+
+## [26.6.1](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v26.6.0...sdk-node-v26.6.1) (2026-03-25)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.6.0 to 26.6.1
+    * @looker/sdk-rtl bumped from 21.6.4 to 21.6.5
+
+## [26.6.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v26.4.0...sdk-node-v26.6.0) (2026-03-20)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.4.0 to 26.6.0
+
+## [26.4.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v26.2.0...sdk-node-v26.4.0) (2026-03-11)
+
+
+### Bug Fixes
+
+* **tests:** fix some unit test failures and document remaining issues ([#1643](https://github.com/looker-open-source/sdk-codegen/issues/1643)) ([299ba8b](https://github.com/looker-open-source/sdk-codegen/commit/299ba8bd4ca6c406059da39b5fa2d44852b23ee5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.2.0 to 26.4.0
+
+## [26.2.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v26.0.0...sdk-node-v26.2.0) (2026-02-13)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.0.0 to 26.2.0
+
+## [26.0.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.20.0...sdk-node-v26.0.0) (2026-02-02)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.20.0 to 26.0.0
+
+## [25.20.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.18.0...sdk-node-v25.20.0) (2025-11-05)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.18.0 to 25.20.0
+
+## [25.18.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.16.0...sdk-node-v25.18.0) (2025-10-28)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.16.0 to 25.18.0
+
+## [25.16.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.10.0...sdk-node-v25.16.0) (2025-09-17)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.10.0 to 25.16.0
+
+## [25.10.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.8.0...sdk-node-v25.10.0) (2025-06-20)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.8.0 to 25.10.0
+
+## [25.8.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.6.0...sdk-node-v25.8.0) (2025-05-19)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.6.0 to 25.8.0
+
+## [25.6.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.4.0...sdk-node-v25.6.0) (2025-05-05)
+
+
+### Miscellaneous Chores
+
+* **sdk-node:** Synchronize undefined versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.4.0 to 25.6.0
+
 ## [25.4.0](https://github.com/looker-open-source/sdk-codegen/compare/sdk-node-v25.2.0...sdk-node-v25.4.0) (2025-03-11)
 
 

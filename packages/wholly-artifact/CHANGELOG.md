@@ -231,6 +231,127 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * devDependencies
     * @looker/sdk-node bumped from 25.2.0 to 25.4.0
 
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.4.0 to 25.6.0
+  * devDependencies
+    * @looker/sdk-node bumped from 25.4.0 to 25.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.6.0 to 25.8.0
+  * devDependencies
+    * @looker/sdk-node bumped from 25.6.0 to 25.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.8.0 to 25.10.0
+  * devDependencies
+    * @looker/sdk-node bumped from 25.8.0 to 25.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.10.0 to 25.16.0
+  * devDependencies
+    * @looker/sdk-node bumped from 25.10.0 to 25.16.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.16.0 to 25.18.0
+  * devDependencies
+    * @looker/sdk-node bumped from 25.16.0 to 25.18.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.18.0 to 25.20.0
+  * devDependencies
+    * @looker/sdk-node bumped from 25.18.0 to 25.20.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 25.20.0 to 26.0.0
+  * devDependencies
+    * @looker/sdk-node bumped from 25.20.0 to 26.0.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.0.0 to 26.2.0
+  * devDependencies
+    * @looker/sdk-node bumped from 26.0.0 to 26.2.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.4.0 to 26.6.0
+  * devDependencies
+    * @looker/sdk-node bumped from 26.4.0 to 26.6.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk-rtl bumped from 21.6.4 to 21.6.5
+    * @looker/sdk bumped from 26.6.0 to 26.6.1
+  * devDependencies
+    * @looker/sdk-node bumped from 26.6.0 to 26.6.1
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.6.1 to 26.8.0
+  * devDependencies
+    * @looker/sdk-node bumped from 26.6.1 to 26.8.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.8.0 to 26.10.0
+  * devDependencies
+    * @looker/sdk-node bumped from 26.8.0 to 26.10.0
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.10.0 to 26.12.0
+  * devDependencies
+    * @looker/sdk-node bumped from 26.10.0 to 26.12.0
+
+## [0.1.41](https://github.com/looker-open-source/sdk-codegen/compare/wholly-artifact-v0.1.40...wholly-artifact-v0.1.41) (2026-03-11)
+
+
+### Bug Fixes
+
+* **tests:** fix some unit test failures and document remaining issues ([#1643](https://github.com/looker-open-source/sdk-codegen/issues/1643)) ([299ba8b](https://github.com/looker-open-source/sdk-codegen/commit/299ba8bd4ca6c406059da39b5fa2d44852b23ee5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @looker/sdk bumped from 26.2.0 to 26.4.0
+  * devDependencies
+    * @looker/sdk-node bumped from 26.2.0 to 26.4.0
+
 ## [0.1.24](https://github.com/looker-open-source/sdk-codegen/compare/wholly-artifact-v0.1.23...wholly-artifact-v0.1.24) (2024-09-14)
 
 
