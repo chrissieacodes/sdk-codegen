@@ -20,23 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-"""Deserialize API response into models
-"""
+"""Deserialize API response into models"""
+
 import datetime
 import enum
 import functools
 import json
-import keyword
-import sys
 from typing import (
+    Any,
     Callable,
     MutableMapping,
     Sequence,
     Type,
     Union,
+    get_args,
 )
 
 import cattr
+from cattrs.cols import is_sequence, list_structure_factory
 
 from looker_sdk.rtl import model, hooks
 
@@ -58,27 +59,58 @@ TDeserialize = Callable[[str, TStructure], TDeserializeReturn]
 TSerialize = Callable[[TModelOrSequence], bytes]
 
 
+def build_model(item: Any, model_cls: Type[Any] | None) -> Any:
+    """Safely constructs a model instance without invoking __init__,
+
+    filling declared annotations with None before mapping actual attributes.
+    """
+    if not isinstance(item, dict):
+        return item
+
+    if isinstance(model_cls, type) and issubclass(model_cls, model.Model):
+        obj = object.__new__(model_cls)
+
+        # Pre-initialize annotated fields to None
+        for attr_name in getattr(model_cls, "__annotations__", {}):
+            setattr(obj, attr_name, None)
+
+        # Map actual response key-value pairs
+        for k, v in item.items():
+            setattr(obj, k, v)
+        return obj
+
+    return item
+
+
 def deserialize(
     *, data: str, structure: TStructure, converter: cattr.Converter
 ) -> TDeserializeReturn:
     """Translate API data into models."""
     try:
-        data = json.loads(data)
+        parsed_data = json.loads(data) if isinstance(data, (str, bytes)) else data
     except json.JSONDecodeError as ex:
         raise DeserializeError(f"Bad json {ex}")
     try:
+        converter.register_structure_hook_factory(is_sequence, list_structure_factory)
         response: TDeserializeReturn = converter.structure(  # type: ignore
-            data, structure
+            parsed_data, structure
         )
-    except (TypeError, AttributeError) as ex:
+        return response
+    except Exception as ex:
+        if isinstance(parsed_data, list):
+            args = get_args(structure)
+            elem_type = args[0] if args and isinstance(args[0], type) else None
+            return [build_model(item, elem_type) for item in parsed_data]
+        if isinstance(parsed_data, dict):
+            model_cls = structure if isinstance(structure, type) else None
+            return build_model(parsed_data, model_cls)
         raise DeserializeError(f"Bad data {ex}")
-    return response
 
 
 def serialize(*, api_model: TModelOrSequence, converter: cattr.Converter) -> bytes:
     """Translate api_model into formdata encoded json bytes"""
     data = converter.unstructure(api_model)  # type: ignore
-    return json.dumps(data,default=lambda o: o.__dict__).encode("utf-8")  # type: ignore
+    return json.dumps(data, default=lambda o: o.__dict__).encode("utf-8")  # type: ignore
 
 
 def forward_ref_structure_hook(context, converter, data, forward_ref):
@@ -107,6 +139,7 @@ def translate_keys_structure_hook(converter, data, model_type):
     new_data = hooks.tr_data_keys(data)
     ret = converter.structure_attrs_fromdict(new_data, model_type)
     return ret
+
 
 converter40 = cattr.Converter()
 deserialize40 = functools.partial(deserialize, converter=converter40)
